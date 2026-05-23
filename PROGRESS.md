@@ -4,6 +4,28 @@ Running changelog of what was built, session by session.
 
 ---
 
+## [2026-05-23] — PR #4 merged: Vercel serverless + GitHub Actions CI/CD
+
+### What was merged (PR #4)
+
+- `api/challenge.js` — Vercel serverless handler replacing Express for production
+- `vercel.json` — build config, API rewrite, 30s function maxDuration, project name "world-quest"
+- `.github/workflows/ci.yml` — three-job pipeline: test-and-build / deploy (main) / preview (PRs); Vercel secrets wired; preview URL posted as PR comment
+- `sonar-project.properties` — added but ultimately ineffective (see below)
+
+### What was discovered
+
+- SonarCloud Automatic Analysis ignores `sonar-project.properties`; CPD exclusions must be set in the SonarCloud dashboard (Administration → Quality Gates or Analysis Scope)
+- GitHub Actions `test:run` step needs `--if-present` until Vitest is installed
+- Vercel ORG_ID and PROJECT_ID are found in vercel.com dashboard project Settings, not via CLI
+
+### What was left incomplete
+
+- SonarCloud duplication quality gate still failing — needs dashboard fix by user
+- Vitest not yet installed; `test:run` step is a no-op
+
+---
+
 ## [2026-05-23] — GitHub Actions CI/CD + Vercel project name
 
 ### What was built

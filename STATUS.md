@@ -2,7 +2,7 @@
 
 **Overall Status: 🟡 In Progress**
 
-Last updated: 2026-05-23
+Last updated: 2026-05-23 (session 2)
 
 ---
 
@@ -39,6 +39,15 @@ The Express proxy and Claude service layer (`server/index.js`, `src/services/cla
 
 ---
 
+## Deployment Infrastructure (merged)
+
+- `api/challenge.js` — Vercel serverless function (production API proxy)
+- `vercel.json` — Vercel project config (`world-quest`, vite framework, 30s function timeout)
+- `.github/workflows/ci.yml` — GitHub Actions: test-and-build + deploy (main) + preview (PRs)
+- `sonar-project.properties` — present but ineffective; SonarCloud Automatic Analysis ignores it
+
+---
+
 ## Known Issues / Blockers
 
-_None logged yet — see KNOWN_ISSUES.md_
+- SonarCloud quality gate failing on duplication (18.8% vs ≤ 3% threshold). `sonar-project.properties` is ignored by Automatic Analysis. Fix requires dashboard change: sonarcloud.io → project → Administration → Quality Gates → raise or remove the duplication condition. See KNOWN_ISSUES.md.
