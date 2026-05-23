@@ -1,4 +1,5 @@
 {
+  "name": "world-quest",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "framework": "vite",
