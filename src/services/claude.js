@@ -1,6 +1,7 @@
 import { buildSystemPrompt } from '../constants/prompts.js'
 
 export async function fetchChallenge({ hero, world, challengeNumber }) {
+  console.log('🌍 Generating for world:', world.id, '| challenge:', challengeNumber)
   const systemPrompt = buildSystemPrompt({ hero, world, challengeNumber })
 
   const res = await fetch('/api/challenge', {
