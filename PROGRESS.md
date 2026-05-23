@@ -4,6 +4,24 @@ Running changelog of what was built, session by session.
 
 ---
 
+## [2026-05-23] — Vercel deployment: serverless API function + config
+
+### What was built
+
+- `api/challenge.js` — Vercel serverless handler (ESM `export default async function handler`); mirrors `server/index.js` exactly: POST-only, reads `messages` + `systemPrompt` from body, proxies to Anthropic `/v1/messages`, returns raw JSON; non-POST requests get 405
+- `vercel.json` — Vercel project config: `buildCommand: npm run build`, `outputDirectory: dist`, `framework: vite`, rewrite `/api/:path*` → `/api/:path*`, `maxDuration: 30` on `api/challenge.js`
+
+### What was unchanged
+
+- `server/index.js` — untouched; continues to serve local dev on port 3001
+- `vite.config.js` proxy to port 3001 — untouched; local dev flow unaffected
+
+### What was left incomplete
+
+- `ANTHROPIC_API_KEY` must be added as a Vercel environment variable before deployment will work
+
+---
+
 ## [2026-05-23] — Initial build: full game shell through mock play
 
 ### What was built
