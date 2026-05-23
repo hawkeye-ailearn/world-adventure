@@ -26,7 +26,7 @@ const VALID_NUMBER = {
 }
 
 function mockFetchSuccess(payload) {
-  global.fetch = vi.fn().mockResolvedValue({
+  globalThis.fetch = vi.fn().mockResolvedValue({
     ok: true,
     json: () => Promise.resolve({ content: [{ text: JSON.stringify(payload) }] }),
   })
@@ -67,12 +67,12 @@ describe('fetchChallenge - error handling', () => {
   beforeEach(() => vi.resetAllMocks())
 
   it('non-ok HTTP response throws an error', async () => {
-    global.fetch = vi.fn().mockResolvedValue({ ok: false, status: 500 })
+    globalThis.fetch = vi.fn().mockResolvedValue({ ok: false, status: 500 })
     await expect(fetchChallenge(defaultArgs)).rejects.toThrow('API error 500')
   })
 
   it('network failure propagates the error', async () => {
-    global.fetch = vi.fn().mockRejectedValue(new Error('Network error'))
+    globalThis.fetch = vi.fn().mockRejectedValue(new Error('Network error'))
     await expect(fetchChallenge(defaultArgs)).rejects.toThrow('Network error')
   })
 })
@@ -83,7 +83,7 @@ describe('fetchChallenge - prompt construction', () => {
   it('fetch body contains the world context string', async () => {
     mockFetchSuccess(VALID_MCQ)
     await fetchChallenge(defaultArgs)
-    const [, init] = global.fetch.mock.calls[0]
+    const [, init] = globalThis.fetch.mock.calls[0]
     const body = JSON.parse(init.body)
     expect(body.systemPrompt).toContain(MOCK_WORLD.context)
   })
@@ -91,7 +91,7 @@ describe('fetchChallenge - prompt construction', () => {
   it('fetch body contains the hero name', async () => {
     mockFetchSuccess(VALID_MCQ)
     await fetchChallenge(defaultArgs)
-    const [, init] = global.fetch.mock.calls[0]
+    const [, init] = globalThis.fetch.mock.calls[0]
     const body = JSON.parse(init.body)
     expect(body.systemPrompt).toContain(MOCK_HERO.name)
   })
