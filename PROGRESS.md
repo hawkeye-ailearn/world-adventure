@@ -4,6 +4,28 @@ Running changelog of what was built, session by session.
 
 ---
 
+## [2026-05-23] — Vitest testing suite (33 tests, all passing)
+
+### What was built
+
+- Installed `vitest`, `@vitest/coverage-v8`, `@testing-library/react`, `@testing-library/jest-dom`, `jsdom` as devDependencies
+- `vitest.config.js` — Vitest config using `defineConfig` from `vitest/config`, jsdom environment, globals enabled, coverage scoped to `src/hooks/**`, `src/services/**`, `src/constants/**`
+- `src/__tests__/setup.js` — imports `@testing-library/jest-dom` for extended matchers
+- `package.json` — added `test`, `test:run`, `coverage` scripts
+- `src/__tests__/useGameState.test.js` — 18 tests covering initial state, hero creation, XP/levelling, and world progression (including full 5-world end-to-end flow to game-complete)
+- `src/__tests__/claude.service.test.js` — 7 tests covering happy-path MCQ/number responses, HTTP error handling, network failure propagation, and prompt body construction checks
+- `src/__tests__/prompts.test.js` — 8 tests guarding the system prompt structure, JSON contract fields, question types, and age-appropriateness language
+
+### Results
+
+`npm run test:run` → **3 test files, 33 tests, all passed** (2.36 s)
+
+### What was left incomplete
+
+- `npm run coverage` not verified (lcov report generation requires `@vitest/coverage-v8`, installed but not run)
+
+---
+
 ## [2026-05-23] — GitHub Actions CI/CD + Vercel project name
 
 ### What was built
