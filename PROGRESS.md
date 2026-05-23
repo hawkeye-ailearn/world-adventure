@@ -4,6 +4,46 @@ Running changelog of what was built, session by session.
 
 ---
 
+## [2026-05-23] — GitHub Actions CI/CD + Vercel project name
+
+### What was built
+
+- `.github/workflows/ci.yml` — three-job pipeline:
+  - `test-and-build`: runs on every push and on PRs to main; checkout → Node 20 + npm cache → `npm ci` → lint (if present) → `npm run test:run` → `npm run build` → uploads `dist/` as artifact
+  - `deploy`: push to `main` only, needs `test-and-build`; installs Vercel CLI, pulls production env, builds with `--prod`, deploys prebuilt, posts deployed URL as a commit comment
+  - `preview`: PRs only, needs `test-and-build`; same flow with `--environment=preview`, posts preview URL as a PR comment
+- `vercel.json` — added `"name": "world-quest"` field
+- `DECISIONS.md` — logged Vercel project name and secret requirements
+
+### What was unchanged
+
+- `server/index.js`, `vite.config.js`, `api/challenge.js` — untouched
+
+### What was left incomplete
+
+- Three GitHub secrets must be manually added in repo Settings → Secrets → Actions: `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`
+- `npm run test:run` script not yet in `package.json` (Vitest not installed yet); CI `test-and-build` job will fail until testing is set up
+
+---
+
+## [2026-05-23] — Vercel deployment: serverless API function + config
+
+### What was built
+
+- `api/challenge.js` — Vercel serverless handler (ESM `export default async function handler`); mirrors `server/index.js` exactly: POST-only, reads `messages` + `systemPrompt` from body, proxies to Anthropic `/v1/messages`, returns raw JSON; non-POST requests get 405
+- `vercel.json` — Vercel project config: `buildCommand: npm run build`, `outputDirectory: dist`, `framework: vite`, rewrite `/api/:path*` → `/api/:path*`, `maxDuration: 30` on `api/challenge.js`
+
+### What was unchanged
+
+- `server/index.js` — untouched; continues to serve local dev on port 3001
+- `vite.config.js` proxy to port 3001 — untouched; local dev flow unaffected
+
+### What was left incomplete
+
+- `ANTHROPIC_API_KEY` must be added as a Vercel environment variable before deployment will work
+
+---
+
 ## [2026-05-23] — Initial build: full game shell through mock play
 
 ### What was built

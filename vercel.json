@@ -1,0 +1,14 @@
+{
+  "name": "world-quest",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "framework": "vite",
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "/api/:path*" }
+  ],
+  "functions": {
+    "api/challenge.js": {
+      "maxDuration": 30
+    }
+  }
+}
