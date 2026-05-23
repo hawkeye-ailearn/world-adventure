@@ -22,7 +22,7 @@ jobs:
 
       - run: npm run lint --if-present
 
-      - run: npm run test:run
+      - run: npm run test:run --if-present
 
       - run: npm run build
 
