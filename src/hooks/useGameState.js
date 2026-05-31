@@ -132,8 +132,13 @@ export default function useGameState() {
         return { ...h, xp: h.xp + xpEarned, totalXP: newTotal, level: rank.level, title: rank.title, levelledUp }
       })
 
-      // Accumulate round XP
+      // Accumulate round XP and world XP
       setRoundXP(r => r + xpEarned)
+      setWorldStates(ws =>
+        ws.map(w =>
+          w.id === activeWorldId ? { ...w, xpEarned: w.xpEarned + xpEarned } : w
+        )
+      )
 
       setCurrentChallenge({
         ...currentChallenge,
@@ -219,8 +224,19 @@ export default function useGameState() {
           // Not the last round — advance currentRound
           return { ...w, rounds: updatedRounds, currentRound: currentRound + 1 }
         } else {
-          // Last round — world complete, unlock next
-          return { ...w, rounds: updatedRounds, completed: true }
+          // Last round — world complete; roll up summary fields for WorldComplete + WorldMap
+          const totalStars = Math.round(
+            updatedRounds.reduce((sum, r) => sum + r.starsEarned, 0) / 3
+          )
+          const totalChallenges = 5 + 5 + 6 // rounds 1+2+3
+          return {
+            ...w,
+            rounds: updatedRounds,
+            completed: true,
+            starsEarned: totalStars,
+            challengesCompleted: totalChallenges,
+            xpEarned: w.xpEarned,
+          }
         }
       })
 
