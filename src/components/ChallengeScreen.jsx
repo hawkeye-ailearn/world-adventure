@@ -9,15 +9,20 @@ const CHALLENGE_LABELS = {
   4: { label: 'BOSS',         icon: '👾' },
 }
 
-export default function ChallengeScreen({ hero, world, currentChallenge, onAnswer, onShowHint }) {
-  const { data, challengeNumber, attemptsLeft, hintShown } = currentChallenge
+export default function ChallengeScreen({ hero, world, currentChallenge, onAnswer }) {
+  const { data, challengeNumber, attemptsLeft, hintShown, selectedAnswer, isCorrect } = currentChallenge
   const { Scene } = world
   const isBoss = challengeNumber === 4
   const meta = CHALLENGE_LABELS[challengeNumber] ?? { label: 'Challenge', icon: '❓' }
 
-  // Hearts = attemptsLeft visualisation (non-boss has 2 max, boss 1)
   const maxAttempts = isBoss ? 1 : 2
   const hearts = Array.from({ length: maxAttempts }, (_, i) => i < attemptsLeft)
+
+  // Which option index was the wrong first answer (so it stays red on 2nd attempt)
+  const wrongIndex =
+    isCorrect === false && selectedAnswer !== null && data.answerFormat === 'mcq'
+      ? parseInt(selectedAnswer)
+      : null
 
   return (
     <div
@@ -82,16 +87,22 @@ export default function ChallengeScreen({ hero, world, currentChallenge, onAnswe
           </p>
         </div>
 
-        {/* Hint */}
-        {hintShown && (
+        {/* Hint — slides in after wrong answer */}
+        <div
+          style={{
+            overflow: 'hidden',
+            maxHeight: hintShown ? 120 : 0,
+            transition: 'max-height 0.35s ease-out',
+          }}
+        >
           <div
-            className="rounded-xl px-4 py-2 flex gap-2 items-start"
+            className="rounded-xl px-4 py-3 flex gap-2 items-start"
             style={{ background: '#fffbe6', border: '1.5px solid #f2cc60' }}
           >
             <span>💡</span>
             <p className="font-nunito text-sm" style={{ color: '#7a5c00' }}>{data.hint}</p>
           </div>
-        )}
+        </div>
 
         {/* Answer input */}
         {data.answerFormat === 'mcq' ? (
@@ -99,30 +110,15 @@ export default function ChallengeScreen({ hero, world, currentChallenge, onAnswe
             options={data.options}
             onAnswer={onAnswer}
             world={world}
+            wrongIndex={wrongIndex}
           />
         ) : (
           <NumberPad
+            key={attemptsLeft}
             onAnswer={onAnswer}
             correctAnswer={data.correctAnswer}
             world={world}
           />
-        )}
-
-        {/* Hint button (only when attempts remain and answer not yet given) */}
-        {!hintShown && attemptsLeft < maxAttempts && (
-          <button
-            onClick={onShowHint}
-            className="font-nunito font-semibold text-sm rounded-xl self-center px-5 py-2"
-            style={{
-              background: 'transparent',
-              color: world.accentColor,
-              border: `1.5px solid ${world.borderColor}`,
-              minHeight: 44,
-              cursor: 'pointer',
-            }}
-          >
-            💡 Show Hint
-          </button>
         )}
       </div>
     </div>

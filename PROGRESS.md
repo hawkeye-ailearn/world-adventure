@@ -4,6 +4,26 @@ Running changelog of what was built, session by session.
 
 ---
 
+## [2026-05-31] — Phase 4: game mechanics complete
+
+### What was built
+
+- **Wrong-answer flow fixed**: `submitAnswer` now stays on ChallengeScreen for 2nd attempt (wrong option highlights red, hint auto-slides in via CSS max-height transition); only advances to ResultScreen when correct or all attempts exhausted
+- **MCQInput `wrongIndex` prop**: wrong option stays red on 2nd attempt without disabling other buttons
+- **ResultScreen 3 states**: State A (1st-attempt correct — gold star, big celebration), State B (2nd-attempt correct — silver ⚡), State C (both wrong — warm amber, no red, correct answer shown, "Keep going →")
+- **Level-up banner**: ResultScreen shows "🎉 Level Up! You are now [Title]!" when `hero.levelledUp` flag is set
+- **XP tracking per world**: `worldState.xpEarned` accumulates in `submitAnswer`; shown on WorldComplete
+- **WorldComplete**: "You unlocked [Next World]!" message with next world emoji; final world (India) shows crown + "You completed World Quest!" + special button
+- **HeroBar XP count-up**: rAF animation eases XP number from old to new value over 0.8s
+- `getNextWorld()` helper added to `useGameState`, `tryAgain` removed (no longer needed)
+- App.jsx cleaned up: no more `tryAgain` prop, `nextWorld` passed to WorldComplete
+
+### What was left incomplete
+
+- Tests for new game mechanics not yet written (existing tests may need updates for `levelledUp` flag and `xpEarned` in worldState)
+
+---
+
 ## [2026-05-31] — CI fixes + SonarCloud quality gate
 
 ### What was built / fixed
