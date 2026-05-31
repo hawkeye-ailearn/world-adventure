@@ -50,7 +50,7 @@ test.describe('Challenge Screen — MCQ (Q1 history)', () => {
   })
 
   test('hint is NOT shown before any wrong answer', async ({ page }) => {
-    await expect(page.getByTestId('hint-text')).not.toBeVisible()
+    await expect(page.getByTestId('hint-wrapper')).not.toBeVisible()
   })
 
   test('HeroBar shows hero name', async ({ page }) => {
@@ -165,8 +165,8 @@ test.describe('Challenge Screen — MCQ (Q1 history)', () => {
       })
 
       test('result shows correct answer', async ({ page }) => {
-        // State C shows the correct answer
-        await expect(page.getByText('Khufu')).toBeVisible()
+        // State C shows answer as '✅ Khufu'
+        await expect(page.getByText('✅ Khufu')).toBeVisible()
       })
 
       test('result shows "Keep going →" button (state C)', async ({ page }) => {

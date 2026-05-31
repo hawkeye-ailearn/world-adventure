@@ -168,9 +168,9 @@ test.describe('World Complete Screen', () => {
     await expect(page.getByTestId('world-entry-screen')).toBeVisible()
   })
 
-  test('Egypt shows ✅ on map after completion', async ({ page }) => {
+  test('Egypt shows stars on map after completion', async ({ page }) => {
     await completeEgypt(page)
     await page.getByTestId('world-complete-back-btn').click()
-    await expect(page.getByTestId('world-node-egypt')).toContainText('✅')
+    await expect(page.getByTestId('world-node-egypt')).toContainText('⭐')
   })
 })

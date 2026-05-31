@@ -84,7 +84,7 @@ test.describe('Full Game Playthrough', () => {
     await expect(page.getByText(/refresh to play again/i)).toBeVisible()
   })
 
-  test('world map shows ✅ on all 4 intermediate worlds before final', async ({ page }) => {
+  test('world map shows stars on all 4 intermediate worlds before final', async ({ page }) => {
     await goto(page)
     await createHero(page)
 
@@ -95,12 +95,12 @@ test.describe('Full Game Playthrough', () => {
       await completeWorldAllCorrect(page)
     }
 
-    // Check first 4 have ✅
+    // Check first 4 show stars (completed)
     for (const nodeId of WORLD_NODES.slice(0, 4)) {
-      await expect(page.getByTestId(nodeId)).toContainText('✅')
+      await expect(page.getByTestId(nodeId)).toContainText('⭐')
     }
-    // India not yet complete
-    await expect(page.getByTestId('world-node-india')).not.toContainText('✅')
+    // India not yet complete — no stars
+    await expect(page.getByTestId('world-node-india')).not.toContainText('⭐')
   })
 
   test('India unlocks after completing Safari', async ({ page }) => {

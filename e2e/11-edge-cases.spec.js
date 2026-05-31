@@ -18,14 +18,14 @@ test.describe('Edge Cases', () => {
     await answerQ1Correct(page)
     await page.getByTestId('result-continue-btn').click()
     // On Q2: hint should NOT be visible
-    await expect(page.getByTestId('hint-text')).not.toBeVisible()
+    await expect(page.getByTestId('hint-wrapper')).not.toBeVisible()
   })
 
   // ----- Hint slides in automatically, no button required -----
 
   test('hint appears automatically on challenge screen after wrong first attempt', async ({ page }) => {
     await goToEgyptChallenge(page)
-    await expect(page.getByTestId('hint-text')).not.toBeVisible() // before any answer
+    await expect(page.getByTestId('hint-wrapper')).not.toBeVisible() // before any answer
     await answerQ1WrongFirst(page)
     await expect(page.getByTestId('hint-text')).toBeVisible()     // after wrong answer
   })
@@ -104,7 +104,7 @@ test.describe('Edge Cases', () => {
     await page.getByTestId('mcq-option-1').click()
     await page.getByTestId('result-continue-btn').click()
     // Now on Q4 boss — hint should never appear
-    await expect(page.getByTestId('hint-text')).not.toBeVisible()
+    await expect(page.getByTestId('hint-wrapper')).not.toBeVisible()
   })
 
   // ----- NumberPad refuses empty submit -----

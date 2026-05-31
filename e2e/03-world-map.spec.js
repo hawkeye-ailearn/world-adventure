@@ -25,39 +25,24 @@ test.describe('World Map', () => {
     }
   })
 
-  test('Egypt node is unlocked (pointer cursor)', async ({ page }) => {
-    const cursor = await page
-      .getByTestId('world-node-egypt')
-      .evaluate(el => window.getComputedStyle(el).cursor)
-    expect(cursor).toBe('pointer')
+  test('Egypt node is unlocked (tabIndex 0)', async ({ page }) => {
+    await expect(page.getByTestId('world-node-egypt')).toHaveAttribute('tabindex', '0')
   })
 
-  test('Medieval node is locked initially (default cursor)', async ({ page }) => {
-    const cursor = await page
-      .getByTestId('world-node-medieval')
-      .evaluate(el => window.getComputedStyle(el).cursor)
-    expect(cursor).toBe('default')
+  test('Medieval node is locked initially (tabIndex -1)', async ({ page }) => {
+    await expect(page.getByTestId('world-node-medieval')).toHaveAttribute('tabindex', '-1')
   })
 
-  test('Space node is locked initially (default cursor)', async ({ page }) => {
-    const cursor = await page
-      .getByTestId('world-node-space')
-      .evaluate(el => window.getComputedStyle(el).cursor)
-    expect(cursor).toBe('default')
+  test('Space node is locked initially (tabIndex -1)', async ({ page }) => {
+    await expect(page.getByTestId('world-node-space')).toHaveAttribute('tabindex', '-1')
   })
 
-  test('Safari node is locked initially (default cursor)', async ({ page }) => {
-    const cursor = await page
-      .getByTestId('world-node-safari')
-      .evaluate(el => window.getComputedStyle(el).cursor)
-    expect(cursor).toBe('default')
+  test('Safari node is locked initially (tabIndex -1)', async ({ page }) => {
+    await expect(page.getByTestId('world-node-safari')).toHaveAttribute('tabindex', '-1')
   })
 
-  test('India node is locked initially (default cursor)', async ({ page }) => {
-    const cursor = await page
-      .getByTestId('world-node-india')
-      .evaluate(el => window.getComputedStyle(el).cursor)
-    expect(cursor).toBe('default')
+  test('India node is locked initially (tabIndex -1)', async ({ page }) => {
+    await expect(page.getByTestId('world-node-india')).toHaveAttribute('tabindex', '-1')
   })
 
   test('locked world nodes display a lock emoji', async ({ page }) => {
@@ -120,15 +105,12 @@ test.describe('World Map — after completing Egypt', () => {
     await page.getByTestId('world-complete-back-btn').click()
   })
 
-  test('Egypt node shows completion checkmark', async ({ page }) => {
-    await expect(page.getByTestId('world-node-egypt')).toContainText('✅')
+  test('Egypt node shows stars after completion', async ({ page }) => {
+    await expect(page.getByTestId('world-node-egypt')).toContainText('⭐')
   })
 
-  test('Medieval becomes unlocked after Egypt completion', async ({ page }) => {
-    const cursor = await page
-      .getByTestId('world-node-medieval')
-      .evaluate(el => window.getComputedStyle(el).cursor)
-    expect(cursor).toBe('pointer')
+  test('Medieval becomes unlocked after Egypt completion (tabIndex 0)', async ({ page }) => {
+    await expect(page.getByTestId('world-node-medieval')).toHaveAttribute('tabindex', '0')
   })
 
   test('Medieval no longer shows lock emoji after unlock', async ({ page }) => {
@@ -136,12 +118,9 @@ test.describe('World Map — after completing Egypt', () => {
     expect(medievalText).not.toContain('🔒')
   })
 
-  test('Space, Safari, India still locked after only Egypt done', async ({ page }) => {
+  test('Space, Safari, India still locked after only Egypt done (tabIndex -1)', async ({ page }) => {
     for (const id of ['space', 'safari', 'india']) {
-      const cursor = await page
-        .getByTestId(`world-node-${id}`)
-        .evaluate(el => window.getComputedStyle(el).cursor)
-      expect(cursor).toBe('default')
+      await expect(page.getByTestId(`world-node-${id}`)).toHaveAttribute('tabindex', '-1')
     }
   })
 

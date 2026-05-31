@@ -100,7 +100,8 @@ test.describe('XP and Levelling', () => {
     await answerQ3Correct(page)
     // At Q3 result: totalXP = 300 → level-up banner should appear
     await expect(page.getByText('Level Up!')).toBeVisible()
-    await expect(page.getByText('Explorer')).toBeVisible()
+    // 'Explorer' appears in both HeroBar and banner — scope to the banner
+    await expect(page.getByText(/You are now a/).locator('..').getByText('Explorer')).toBeVisible()
   })
 
   test('result screen shows total XP alongside earned XP', async ({ page }) => {

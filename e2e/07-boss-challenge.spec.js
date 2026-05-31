@@ -45,7 +45,7 @@ test.describe('Boss Challenge (Q4)', () => {
   })
 
   test('hint NOT shown before any answer on boss (boss has 1 attempt, no auto-hint)', async ({ page }) => {
-    await expect(page.getByTestId('hint-text')).not.toBeVisible()
+    await expect(page.getByTestId('hint-wrapper')).not.toBeVisible()
   })
 
   // ----- Correct boss answer -----
@@ -106,8 +106,8 @@ test.describe('Boss Challenge (Q4)', () => {
     })
 
     test('shows correct answer on result screen', async ({ page }) => {
-      await expect(page.getByText('Correct answer:')).toBeVisible()
-      await expect(page.locator('strong').filter({ hasText: '5' })).toBeVisible()
+      // State C shows answer as '✅ 5' (no 'Correct answer:' label)
+      await expect(page.getByText('✅ 5')).toBeVisible()
     })
 
     test('clicking Keep Going leads to world-complete screen', async ({ page }) => {

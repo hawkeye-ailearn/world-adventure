@@ -91,6 +91,7 @@ export default function ChallengeScreen({ hero, world, currentChallenge, onAnswe
 
         {/* Hint — slides in after wrong answer */}
         <div
+          data-testid="hint-wrapper"
           style={{
             overflow: 'hidden',
             maxHeight: hintShown ? 120 : 0,

@@ -50,7 +50,7 @@ test.describe('Challenge Screen — NumberPad (Q2 math)', () => {
   })
 
   test('hint is NOT shown before any wrong answer', async ({ page }) => {
-    await expect(page.getByTestId('hint-text')).not.toBeVisible()
+    await expect(page.getByTestId('hint-wrapper')).not.toBeVisible()
   })
 
   // ----- Input building -----
@@ -156,7 +156,7 @@ test.describe('Challenge Screen — NumberPad (Q2 math)', () => {
   test('correct answer on result screen is shown after both wrong', async ({ page }) => {
     await answerQ2WrongFirst(page)
     await answerQ2WrongSecond(page)
-    await expect(page.getByText('Correct answer:')).toBeVisible()
-    await expect(page.getByText('61')).toBeVisible()
+    // State C shows answer as '✅ 61' (no 'Correct answer:' label)
+    await expect(page.getByText('✅ 61')).toBeVisible()
   })
 })
