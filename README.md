@@ -45,10 +45,8 @@ That's it. No database. No sign-in. No build step needed for local play.
 ```
 world-adventure/
 ├── CLAUDE.md                       ← Project brief, design rules, build order
-├── STATUS.md                       ← Current build phase progress
-├── PROGRESS.md                     ← Session-by-session dev log
+├── STATUS.md                       ← Build phase progress + known issues + next steps
 ├── DECISIONS.md                    ← Architectural decision record
-├── KNOWN_ISSUES.md                 ← Bugs and known limitations
 ├── server/
 │   └── index.js                    ← Express proxy (40 lines, API key lives here)
 ├── src/
