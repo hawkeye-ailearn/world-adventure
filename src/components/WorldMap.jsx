@@ -56,13 +56,12 @@ export default function WorldMap({ worldStates, onSelectWorld }) {
           return (
             <div
               key={world.id}
-              onClick={() => unlocked && onSelectWorld(world.id)}
+              onClick={() => { if (unlocked) onSelectWorld(world.id) }}
               style={{
                 position: 'absolute',
                 left: pos.left,
                 top: pos.top,
                 transform: 'translate(-50%, -50%)',
-                // Bob animation applied via className so it includes the translate
               }}
             >
               {/* Zone hit-area + visual ring */}
