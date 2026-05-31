@@ -84,7 +84,6 @@
 
 ### ⬜ Not Started
 
-- `useChallenge.js` hook (fetch + prefetch, hide Claude latency during result screen) — the single remaining Phase 3 task
 - iPad viewport meta tags (`user-scalable=no`, `touch-action`) — not confirmed in `index.html`
 - Map world-unlock celebration animation
 

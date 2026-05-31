@@ -21,14 +21,12 @@ Every Claude Code session working on this project MUST follow this protocol, no 
 **START OF SESSION:**
 1. Read CLAUDE.md fully (you are doing this now)
 2. Read STATUS.md to understand current project state
-3. Read the last 2 entries in PROGRESS.md for recent context
-4. Do not write any code until steps 1–3 are done
+3. Do not write any code until steps 1–2 are done
 
 **END OF SESSION (before closing):**
-1. Update STATUS.md — change phase statuses to reflect what was completed this session
-2. Add a new entry to PROGRESS.md with today's date, a one-line title, bullet list of what was built/changed, and anything left incomplete
-3. Add to KNOWN_ISSUES.md if any bugs or limitations were discovered
-4. If an architectural decision was made, log it in DECISIONS.md
+1. Update STATUS.md — move items between Done / Needs Attention / In Progress / Not Started to reflect what was completed, and update the "Next Session" line
+2. Add any new bugs or limitations discovered to the Known Issues section of STATUS.md
+3. If an architectural decision was made, log it in DECISIONS.md
 
 This is non-negotiable. A session that builds but does not update the status files is an incomplete session.
 
