@@ -2,7 +2,7 @@
 
 **Overall Status: 🟡 In Progress**
 
-Last updated: 2026-05-23 (testing suite added)
+Last updated: 2026-05-31 (CI fixes + SonarCloud merged)
 
 ---
 
@@ -36,6 +36,8 @@ The game is fully playable end-to-end using **mock questions** hardcoded in `use
 - Reach the Game Complete screen with animated confetti and their hero title
 
 The Express proxy and Claude service layer (`server/index.js`, `src/services/claude.js`, `src/constants/prompts.js`) are fully built and ready — the game just hasn't been wired to call them yet.
+
+**Testing & CI:** Vitest testing suite (33 tests across `useGameState`, `claude.service`, and `prompts`) is fully merged and passing. GitHub Actions CI pipeline is live with the `--if-present` lint fix applied. SonarCloud CPD exclusions added to pass the duplication quality gate.
 
 ---
 
