@@ -74,7 +74,7 @@
 - Tests updated for 3-round structure with round progression tests added
 - GitHub Actions CI pipeline live (`test-and-build`, `deploy`, `preview` jobs)
 - Vercel serverless deployment config (`vercel.json`, `api/challenge.js`)
-- SonarCloud CPD exclusions added to pass duplication quality gate
+- SonarCloud Quality Gate passing ✅ — 0.0% duplication on new code (extracted `WorldBar.jsx` and `LevelUpBanner.jsx` shared components to eliminate JSX duplication between `ResultScreen` and `RoundComplete`)
 
 ---
 
