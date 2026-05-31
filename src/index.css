@@ -59,9 +59,19 @@ body {
   0%, 100% { transform: translateY(0); }
   50%       { transform: translateY(-6px); }
 }
+@keyframes bob {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-6px); }
+}
+@keyframes goldPulse {
+  0%, 100% { box-shadow: 0 0 0 4px #f2cc60, 0 0 18px 6px rgba(242,204,96,0.55); }
+  50%       { box-shadow: 0 0 0 6px #f2cc60, 0 0 28px 10px rgba(242,204,96,0.75); }
+}
 
 .animate-fadeIn  { animation: fadeIn  0.25s ease-out forwards; }
 .animate-slideUp { animation: slideUp 0.3s  ease-out forwards; }
 .animate-popIn   { animation: popIn   0.3s  ease-out forwards; }
 .animate-shimmer { animation: shimmer 1.6s  ease-in-out infinite; }
 .animate-bounce-slow { animation: bounce 2s ease-in-out infinite; }
+.animate-bob     { animation: bob 2.2s ease-in-out infinite; }
+.animate-gold-pulse { animation: goldPulse 1.8s ease-in-out infinite; }

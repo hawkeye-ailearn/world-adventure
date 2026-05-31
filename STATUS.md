@@ -2,7 +2,7 @@
 
 **Overall Status: 🟡 In Progress**
 
-Last updated: 2026-05-31 (CI fixes + SonarCloud merged)
+Last updated: 2026-05-31 (WorldMap illustrated image + game-state overlays)
 
 ---
 

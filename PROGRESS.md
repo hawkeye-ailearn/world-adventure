@@ -4,6 +4,26 @@ Running changelog of what was built, session by session.
 
 ---
 
+## [2026-05-31] — WorldMap: illustrated image + game-state overlays
+
+### What was built / changed
+
+- `WorldMap.jsx` rewritten: uses `public/world-map.png` as illustrated background via `<img>`, replaces programmatic SVG node drawing
+- Five zone overlays positioned with percentage-based `left/top` to match the watercolour map art (Egypt bottom-left, Medieval bottom-right, Space left-middle, Safari top-right, India top-centre)
+- Inner box aspect-ratio-locked to `1448/1086` so overlays never drift on portrait viewports
+- **Locked zones**: CSS `filter: grayscale(1) brightness(0.55)` + 🔒 emoji overlay, `cursor:default`, no tap handler
+- **Active zones** (unlocked, not completed): gold ring via animated `box-shadow` (`goldPulse` keyframe) + continuous vertical bob (`bob` keyframe)
+- **Completed zones**: world accent-colour border + `⭐` star rating row beneath the circle
+- All zones: `role="button"` + `onKeyDown` for a11y keyboard support
+- Added `@keyframes bob`, `@keyframes goldPulse`, `.animate-bob`, `.animate-gold-pulse` to `index.css`
+- Updated `KNOWN_ISSUES.md` and `DECISIONS.md` per session protocol
+
+### What was left incomplete
+
+- Zone position percentages may need minor tuning once tested on the actual iPad
+
+---
+
 ## [2026-05-31] — Phase 4: game mechanics complete
 
 ### What was built

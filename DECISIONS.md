@@ -28,6 +28,18 @@ The Vercel project is named `world-quest` (set in `vercel.json` under `"name"`).
 
 ---
 
+## WorldMap: illustrated PNG with CSS overlays (not programmatic SVG)
+
+The original `WorldMap.jsx` drew everything programmatically: SVG circles for world nodes, SVG lines for the path, text labels, lock/star glyphs — all in code. This was replaced with a hand-illustrated watercolour treasure-map image (`public/world-map.png`) as the background, with absolutely-positioned HTML/CSS overlays for game logic (lock, gold ring, stars).
+
+**Why:** The illustrated map is far more engaging for a 7-year-old than geometric circles on a dark background. The watercolour art communicates the adventure theme immediately. Game-state logic (locked/active/completed) is a UI concern that belongs in React, not baked into the artwork — so separating them (static image + dynamic overlays) is also the cleaner architecture.
+
+**Key implementation detail:** The overlay `<div>` is positioned inside an inner box whose CSS `aspect-ratio` is locked to the image's natural dimensions (`1448/1086`). This ensures the percentage-based `left/top` zone coordinates always map to the correct artwork regions, regardless of the outer container's shape — critical for portrait iPad where a naive `objectFit: cover` would crop the landscape image and shift all zone positions.
+
+**Trade-off:** The map is now dependent on a binary asset (`public/world-map.png`). Zone positions are hardcoded percentages that may need minor tuning if the artwork changes. Acceptable for a home project.
+
+---
+
 ## Why Vercel serverless (not keeping Express for production)
 
 The Express server is intentionally minimal — a single 50-line proxy file. Keeping a persistent Node process running in production would require a VPS or container, adding infrastructure to manage, pay for, and keep online. Vercel's serverless functions handle the same POST endpoint with zero server management: deploy the repo, add the env var, done. The function-per-route model also scales to zero when Madhav isn't playing, which costs nothing. The Express file stays for local dev (fast iteration, no cold starts), but production uses the serverless equivalent.
