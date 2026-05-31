@@ -1,5 +1,7 @@
 # CLAUDE.md — World Quest
 
+> See STATUS.md for current progress.
+
 ## What This Is
 
 World Quest is a Claude-powered educational RPG game built for Madhav, a 7-year-old

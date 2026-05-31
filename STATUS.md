@@ -1,46 +1,96 @@
-# STATUS.md — World Quest
+# World Quest — Status
 
-**Overall Status: 🟡 In Progress**
-
-Last updated: 2026-05-31 (CI fixes + SonarCloud merged)
-
----
-
-## Build Phase Progress
-
-| Phase | Description | Status |
-|-------|-------------|--------|
-| Phase 1 | Project shell (Vite + Tailwind + Express, App.jsx phase router, HeroBar) | ✅ Complete |
-| Phase 2 | All screens with hardcoded/mock data | ✅ Complete |
-| Phase 3 | Wire Claude in (proxy, service, prompts, useChallenge hook, live questions) | 🟡 In Progress |
-| Phase 4 | Game logic (XP/levelling, hearts/attempts, hint flow, world unlock) | ✅ Complete |
-| Phase 5 | Scene SVG art (all 5 worlds) | ✅ Complete |
-| Phase 6 | Polish (transitions, XP bar animation, loading UX, iPad viewport) | 🟡 In Progress |
+## Last Updated
+2026-05-31
 
 ---
 
-## What Works Right Now
+## Build Progress
 
-The game is fully playable end-to-end using **mock questions** hardcoded in `useGameState.js`. A player can:
+### ✅ Done
 
-- Open the landing screen (animated starfield, bouncing world emojis)
-- Create a hero — pick a name and class (Warrior / Wizard / Explorer)
-- View the world map (SVG with 5 nodes on a winding path, stars on completed worlds, lock icons on locked worlds)
-- Enter each world and read the intro narrative, backed by the world's scene SVG
-- Answer 4 challenges per world (3 regular + 1 boss) via the MCQ 2×2 grid or custom NumberPad
-- See correct/wrong feedback, a fun fact, and earned XP on the result screen
-- Use 2 attempts per question; on first wrong answer, a hint appears
-- Track XP accumulating across the session with level-up (Apprentice → Explorer → Champion → Legend)
-- Complete a world and earn 1–3 stars based on first-attempt accuracy
-- Unlock the next world and continue through all 5
-- Reach the Game Complete screen with animated confetti and their hero title
+**Phase 1 — Project Shell**
+- Vite + React 18 + Tailwind CSS + Express wired together (`npm run dev` starts both)
+- `App.jsx` phase-based router (8 screens, no React Router)
+- `HeroBar.jsx` with XP count-up animation and level display
 
-The Express proxy and Claude service layer (`server/index.js`, `src/services/claude.js`, `src/constants/prompts.js`) are fully built and ready — the game just hasn't been wired to call them yet.
+**Phase 2 — All Screens (mock data)**
+- `LandingScreen.jsx` — animated starfield, bouncing world emojis, gold title
+- `HeroCreator.jsx` — name input + 3-class picker (Warrior / Wizard / Explorer)
+- `WorldMap.jsx` — SVG winding path, 5 nodes, stars/locks/glows
+- `WorldEntry.jsx` — per-world narrative intro with Scene SVG header
+- `ChallengeScreen.jsx` — world bar, hearts, scene, narrative card, hint slide-in, MCQ/NumberPad
+- `MCQInput.jsx` — 2×2 grid, A/B/C/D labels, green/red feedback, wrongIndex persists on 2nd attempt
+- `NumberPad.jsx` — custom on-screen numpad, no iOS keyboard pop-up
+- `ResultScreen.jsx` — 3 states (A: 1st correct, B: 2nd correct, C: both wrong), fun fact always shown
+- `WorldComplete.jsx` — staggered star animation, next-world unlock message, final-world crown
+- `GameComplete.jsx` — animated confetti, final hero title, world stars summary
 
-**Testing & CI:** Vitest testing suite (33 tests across `useGameState`, `claude.service`, and `prompts`) is fully merged and passing. GitHub Actions CI pipeline is live with the `--if-present` lint fix applied. SonarCloud CPD exclusions added to pass the duplication quality gate.
+**Phase 3 — Backend & Claude Service (built, not yet wired to UI)**
+- `server/index.js` — Express proxy, API key server-side only
+- `src/services/claude.js` — `fetchChallenge()` calls `/api/challenge`, parses JSON response
+- `src/constants/prompts.js` — `buildSystemPrompt()` with world lock, class voice, challenge-type rules, JSON-only output
+- `api/challenge.js` — Vercel serverless equivalent of the Express proxy (production)
+
+**Phase 4 — Game Logic**
+- `useGameState.js` — complete state machine: XP, levelling (4 tiers), world unlock, star rating, 2-attempt flow, boss (1 attempt), hint-on-first-wrong, `levelledUp` flag
+- `src/worlds/index.js` — 5 world configs with colours, Scene refs, context strings, loading messages
+
+**Phase 5 — Scene SVG Art**
+- All 5 scenes complete: `EgyptScene`, `MedievalScene`, `SpaceScene`, `SafariScene`, `IndiaScene`
+- All follow spec: `viewBox="0 0 380 180"`, no SVG gradients, layered opacity for depth
+
+**Testing & CI**
+- Vitest suite: 33 tests across `useGameState`, `claude.service`, `prompts` — all passing
+- GitHub Actions CI: push/PR pipeline with lint (if present), test, build, artifact upload
+- SonarCloud CPD exclusions in place
 
 ---
 
-## Known Issues / Blockers
+### ⚠️ Done — Needs Attention
 
-_None logged yet — see KNOWN_ISSUES.md_
+- **Star rating edge case**: code returns 1 star for both 0 and 1 first-attempt correct, which matches spec ("1 star: 0–1"). Worth a second look once live questions are wired — the mock data always ends at challenge 4 with the same results, so real-world star distribution hasn't been tested live.
+- **Error handling gap**: `useGameState` has no `challengeError` or `isLoadingChallenge` fields (defined in CLAUDE.md spec but not implemented). These will be needed when `useChallenge.js` is built.
+- **`returnToMap` game-complete check**: `worldStates.every(w => w.completed)` fires *after* the current world's state update — relies on React state batching timing. Needs verification once all 5 worlds are completable end-to-end.
+- **Tests not updated for Phase 4 additions**: `levelledUp` flag and per-world `xpEarned` field added in Phase 4 but existing test suite may not cover these fully.
+
+---
+
+### 🔨 In Progress
+
+- **Phase 3 wiring**: `useChallenge.js` hook not yet created. The game still reads from `MOCK_CHALLENGES` in `useGameState.js`. `fetchChallenge` from `claude.js` is never called. Live Claude questions not flowing.
+- **Phase 6 Polish (partial)**: CSS transitions are in place. Loading messages are defined in world config. But no loading UI is shown to the player while Claude responds.
+
+---
+
+### ⬜ Not Started
+
+- `useChallenge.js` — fetch + prefetch logic (hides Claude's 2–3s latency during result screen)
+- Wire `useChallenge` into `App.jsx` / `useGameState` — replace `MOCK_CHALLENGES` with live Claude calls
+- Loading state UI — show world-specific loading message + spinner while Claude responds
+- World-unlock animation on the map (visual celebration when a new node opens)
+- Full Phase 6 polish: level-up celebration animation, map world-unlock animation
+- GitHub secrets for Vercel deploy (`VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`) — CI deploy job will fail without these
+- Test coverage for Phase 4 game mechanics (`levelledUp`, `xpEarned` per world)
+
+---
+
+## Known Issues
+
+### Bugs
+_None confirmed._
+
+### Limitations
+- **Session-only state**: closing the browser resets all progress — intentional by design, but worth noting for Madhav's sessions
+- **Mock data only**: until `useChallenge.js` is built and wired, every world plays the same 4 Egypt mock questions regardless of which world is selected
+
+### Nice-to-haves
+- Map world-unlock animation (visual pop/glow when a new world node unlocks)
+- Sound effects (correct answer chime, level-up fanfare)
+- iPad "Add to Home Screen" icon / PWA manifest
+
+---
+
+## Next Session — Pick Up From Here
+
+**Build `useChallenge.js`** — this is the single most impactful next step. It should: call `fetchChallenge({ hero, world, challengeNumber })` from `claude.js`, manage `isLoading` and `error` states, prefetch the next challenge during the result screen to hide latency, and expose the result so `App.jsx` can replace `MOCK_CHALLENGES`. Once this hook exists and is wired into `useGameState` (or `App.jsx`), the game goes live with real Claude questions across all 5 worlds.
