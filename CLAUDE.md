@@ -124,8 +124,11 @@ All game state lives in `useGameState`. This is the single source of truth.
       completed: false,
       starsEarned: 0,                     // 1–3 stars based on first-attempt %
       challengesCompleted: 0,
+      currentRound: 1,                    // 1–3 (Explorer / Adventurer / Champion)
+      roundXP: 0,                         // XP earned in the current round
     },
     // ... medieval, space, safari, india
+    // completeCurrentRound() and startNextRound() helpers live in useGameState.js
   ],
 
   // The active challenge (null when not in challenge phase)
@@ -152,7 +155,7 @@ All game state lives in `useGameState`. This is the single source of truth.
 ```js
 {
   narrative: string,         // 2–3 sentence story setup
-  challengeType: 'history' | 'math' | 'general' | 'boss',
+  challengeType: 'history' | 'math' | 'general' | 'science' | 'mixed' | 'boss',
   question: string,
   answerFormat: 'mcq' | 'number',
   options: string[],         // 4 items, only for mcq
@@ -173,6 +176,9 @@ All game state lives in `useGameState`. This is the single source of truth.
 Correct, 1st attempt  → +100 XP  (or +200 for boss)
 Correct, 2nd attempt  → +50 XP
 Both attempts wrong   → +0 XP (but still shows fun fact)
+
+Boss challenge is Q6 of Round 3 (not Q4).
+XP is also tracked per-round via roundXP in game state (resets at the start of each round).
 
 Level thresholds:
   1 — Apprentice   0–299 XP
@@ -316,6 +322,8 @@ Don't implement lives-across-world — too punishing for a 7-year-old.
 ## Build Order
 
 Build in this order. Don't skip ahead.
+
+Phases 1–5 complete as of 2026-05-31. See STATUS.md for detail.
 
 ```
 Phase 1 — Project shell

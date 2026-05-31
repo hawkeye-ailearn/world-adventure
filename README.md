@@ -98,13 +98,13 @@ world-adventure/
 
 | World | Emoji | Subjects |
 |-------|-------|----------|
-| Ancient Egypt | 🏺 | Egyptian history, maths (addition & multiplication), hieroglyphs |
-| Medieval Europe | 🏰 | Medieval history, castles & knights, general knowledge |
-| Outer Space | 🚀 | Space science, planets & stars, maths (large numbers) |
-| African Safari | 🦁 | Wildlife & ecology, African geography, general knowledge |
-| Ancient India | 🪔 | Indian history, invention of zero, maths (the hardest world!) |
+| Ancient Egypt | 🏺 | Egyptian history, maths (addition & multiplication), hieroglyphs, science/geography, mixed |
+| Medieval Europe | 🏰 | Medieval history, castles & knights, general knowledge, science/geography, mixed |
+| Outer Space | 🚀 | Space science, planets & stars, maths (large numbers), science/geography, mixed |
+| African Safari | 🦁 | Wildlife & ecology, African geography, general knowledge, science/geography, mixed |
+| Ancient India | 🪔 | Indian history, invention of zero, maths (the hardest world!), science/geography, mixed |
 
-Each world has 4 challenges: 3 regular questions and 1 boss challenge worth double XP.
+Each world has 3 rounds (Explorer, Adventurer, Champion). Rounds 1 and 2 each have 5 challenges. Round 3 has 5 regular challenges plus 1 boss challenge worth double XP — 16 challenges per world in total.
 
 ---
 
@@ -115,7 +115,7 @@ Each world has 4 challenges: 3 regular questions and 1 boss challenge worth doub
 | Frontend | React 18 + Vite | Fast dev, clean build |
 | Styling | Tailwind CSS | World-specific theming via Tailwind vars |
 | State | useState + Context | No Redux — game state is simple enough |
-| Backend | Express.js (1 file) | API proxy only — keeps the key off the client |
+| Backend | Express.js (1 file) | API proxy only — keeps the key off the client. Local dev only; production uses `api/challenge.js` as a Vercel serverless function |
 | AI | Claude claude-sonnet-4-20250514 | Via /v1/messages, strict JSON-mode prompting |
 | Fonts | Fredoka One + Nunito | Loaded from Google Fonts CDN |
 
