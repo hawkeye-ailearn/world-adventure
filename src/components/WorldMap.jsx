@@ -31,7 +31,7 @@ function Stars({ count }) {
 
 export default function WorldMap({ worldStates, onSelectWorld }) {
   return (
-    <div className="w-full h-full flex flex-col animate-fadeIn" style={{ background: '#0d0f1a' }}>
+    <div data-testid="world-map-screen" className="w-full h-full flex flex-col animate-fadeIn" style={{ background: '#0d0f1a' }}>
       {/* Header */}
       <div className="px-5 pt-5 pb-2 shrink-0">
         <h2 className="font-fredoka" style={{ color: '#f2cc60', fontSize: 26 }}>World Map</h2>
@@ -84,6 +84,7 @@ export default function WorldMap({ worldStates, onSelectWorld }) {
             return (
               <div
                 key={world.id}
+                data-testid={`world-node-${world.id}`}
                 role="button"
                 tabIndex={unlocked ? 0 : -1}
                 onClick={() => { if (unlocked) onSelectWorld(world.id) }}

@@ -44,6 +44,7 @@ export default function ResultScreen({ hero, world, currentChallenge, onContinue
 
   return (
     <div
+      data-testid="result-screen"
       className="w-full h-full flex flex-col overflow-hidden animate-slideUp"
       style={{ background: world.lightBg }}
     >
@@ -97,6 +98,7 @@ export default function ResultScreen({ hero, world, currentChallenge, onContinue
         {/* XP earned — State A (gold) and B (silver) */}
         {xpEarned > 0 && (
           <div
+            data-testid="result-xp-earned"
             className="flex items-center gap-3 rounded-2xl px-5 py-3 w-full"
             style={{
               background: '#1e2440',
@@ -151,6 +153,7 @@ export default function ResultScreen({ hero, world, currentChallenge, onContinue
         {/* Action button */}
         <div className="flex flex-col gap-3 w-full mt-auto">
           <button
+            data-testid="result-continue-btn"
             onClick={onContinue}
             className="w-full font-fredoka rounded-2xl"
             style={{

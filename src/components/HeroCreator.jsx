@@ -43,6 +43,7 @@ export default function HeroCreator({ onCreateHero }) {
 
   return (
     <div
+      data-testid="hero-creator-screen"
       className="w-full h-full flex flex-col items-center justify-center gap-6 px-6 overflow-hidden animate-fadeIn"
       style={{ background: '#0d0f1a' }}
     >
@@ -62,6 +63,7 @@ export default function HeroCreator({ onCreateHero }) {
           Your hero's name
         </label>
         <input
+          data-testid="hero-name-input"
           type="text"
           value={name}
           onChange={e => setName(e.target.value)}
@@ -93,6 +95,7 @@ export default function HeroCreator({ onCreateHero }) {
             return (
               <button
                 key={cls.id}
+                data-testid={`class-btn-${cls.id}`}
                 onClick={() => setSelectedClass(cls.id)}
                 className="flex items-center gap-4 rounded-2xl text-left w-full"
                 style={{
@@ -128,6 +131,7 @@ export default function HeroCreator({ onCreateHero }) {
 
       {/* Start button */}
       <button
+        data-testid="hero-submit-btn"
         onClick={handleStart}
         disabled={!canStart}
         className="font-fredoka rounded-2xl w-full max-w-sm"

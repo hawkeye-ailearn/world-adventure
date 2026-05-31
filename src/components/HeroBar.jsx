@@ -41,6 +41,7 @@ export default function HeroBar({ hero }) {
 
   return (
     <div
+      data-testid="hero-bar"
       className="flex items-center gap-3 px-4 py-2 shrink-0"
       style={{ background: '#0d0f1a', minHeight: 54 }}
     >
@@ -55,7 +56,7 @@ export default function HeroBar({ hero }) {
         >
           {name || 'Hero'}
         </span>
-        <span className="font-nunito text-xs leading-tight" style={{ color: '#8899bb' }}>
+        <span data-testid="hero-bar-level" className="font-nunito text-xs leading-tight" style={{ color: '#8899bb' }}>
           Lv {level} · {title}
         </span>
       </div>
@@ -64,7 +65,7 @@ export default function HeroBar({ hero }) {
       <div className="flex-1 flex flex-col gap-0.5 min-w-0">
         <div className="flex justify-between items-baseline">
           <span className="font-nunito text-xs" style={{ color: '#8899bb' }}>XP</span>
-          <span className="font-fredoka text-xs" style={{ color: '#f2cc60' }}>{displayXP}</span>
+          <span data-testid="hero-bar-xp" className="font-fredoka text-xs" style={{ color: '#f2cc60' }}>{displayXP}</span>
         </div>
         <div className="w-full rounded-full overflow-hidden" style={{ height: 8, background: '#1e2440' }}>
           <div

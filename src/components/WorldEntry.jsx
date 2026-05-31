@@ -18,6 +18,7 @@ export default function WorldEntry({ world, onEnter }) {
 
   return (
     <div
+      data-testid="world-entry-screen"
       className="w-full h-full flex flex-col animate-slideUp"
       style={{ background: world.lightBg }}
     >
@@ -68,6 +69,7 @@ export default function WorldEntry({ world, onEnter }) {
 
         {/* Enter button */}
         <button
+          data-testid="world-entry-enter-btn"
           onClick={onEnter}
           className="w-full font-fredoka rounded-2xl"
           style={{

@@ -102,3 +102,18 @@ If the Claude API call fails (network error, API key issue, etc.), `fetchChallen
 ## Next Session — Pick Up From Here
 
 **Create `src/hooks/useChallenge.js`** — the only remaining Phase 3 task. The hook should: (1) call `fetchChallenge` from `claude.js`, (2) prefetch the next challenge during the result screen to hide Claude's 2–3s latency, (3) expose `isLoadingChallenge` and `challengeError` state. Then update `useGameState.js` `enterWorld()` and `continueFromResult()` to use it instead of `MOCK_CHALLENGES`. Once this is done, the game is fully live with Claude-generated questions.
+
+---
+
+## E2E Testing (added 2026-05-31)
+
+**Playwright test suite — 195 tests, all passing**
+
+`npm run test:e2e` — runs against Vite dev server, mock challenges, no API key needed.
+
+- `playwright.config.js` — Chromium, 430×932 viewport, `npx vite` webServer
+- `e2e/helpers.js` — shared navigation + per-question answer helpers
+- 11 spec files: `01-landing` → `11-edge-cases` covering every game phase, XP/levelling, star ratings, boss challenge, full 5-world playthrough, and edge cases
+- 30 `data-testid` attributes added across all interactive components for stable selectors
+
+**`issues.md`** — 15 issues catalogued (7 game code, 5 test fixes, 7 coverage gaps for future phases). Key open items: `GameComplete` shows hardcoded ⭐⭐⭐ regardless of actual stars earned; no loading UI; no unlock/level-up animations. Full details in `issues.md`.

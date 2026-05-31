@@ -18,6 +18,7 @@ export default function WorldComplete({ hero, world, worldState, nextWorld, onRe
 
   return (
     <div
+      data-testid="world-complete-screen"
       className="w-full h-full flex flex-col overflow-hidden animate-slideUp"
       style={{ background: world.lightBg }}
     >
@@ -40,7 +41,7 @@ export default function WorldComplete({ hero, world, worldState, nextWorld, onRe
         {/* Trophy + title */}
         <div className="flex flex-col items-center gap-3">
           <span style={{ fontSize: 64 }}>{isFinalWorld ? '👑' : '🏆'}</span>
-          <h3 className="font-fredoka text-center" style={{ color: world.textDark, fontSize: 26 }}>
+          <h3 data-testid="world-complete-heading" className="font-fredoka text-center" style={{ color: world.textDark, fontSize: 26 }}>
             {isFinalWorld
               ? 'You completed World Quest!'
               : isAllThree ? "PERFECT!" : starsEarned === 2 ? "Great Job!" : "Well Done!"}
@@ -56,7 +57,7 @@ export default function WorldComplete({ hero, world, worldState, nextWorld, onRe
         </div>
 
         {/* Stars */}
-        <div className="flex gap-4 items-center justify-center">
+        <div data-testid="world-complete-stars" className="flex gap-4 items-center justify-center">
           {[1, 2, 3].map(n => (
             <span
               key={n}
@@ -100,6 +101,7 @@ export default function WorldComplete({ hero, world, worldState, nextWorld, onRe
 
         {/* Return button */}
         <button
+          data-testid="world-complete-back-btn"
           onClick={onReturnToMap}
           className="w-full font-fredoka rounded-2xl"
           style={{

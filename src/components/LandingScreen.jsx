@@ -16,6 +16,7 @@ export default function LandingScreen({ onStart }) {
 
   return (
     <div
+      data-testid="landing-screen"
       className="relative w-full h-full flex flex-col items-center justify-center overflow-hidden"
       style={{ background: '#0d0f1a' }}
     >
@@ -84,6 +85,7 @@ export default function LandingScreen({ onStart }) {
 
         {/* Begin button */}
         <button
+          data-testid="begin-adventure-btn"
           onClick={onStart}
           className="font-fredoka rounded-2xl w-full"
           style={{
