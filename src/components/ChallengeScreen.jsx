@@ -19,7 +19,7 @@ export default function ChallengeScreen({ hero, world, currentChallenge, onAnswe
   const meta = CHALLENGE_LABELS[challengeNumber] ?? { label: 'Challenge', icon: '❓' }
 
   const maxAttempts = isBoss ? 1 : 2
-  const hearts = Array.from({ length: maxAttempts }, (_, i) => i < attemptsLeft)
+  const hearts = Array.from({ length: maxAttempts }, (_, i) => ({ key: `heart-${i + 1}`, full: i < attemptsLeft }))
 
   // Which option index was the wrong first answer (so it stays red on 2nd attempt)
   const wrongIndex =
@@ -59,8 +59,8 @@ export default function ChallengeScreen({ hero, world, currentChallenge, onAnswe
             {meta.icon} {meta.label}
           </span>
           <div className="flex gap-1 ml-2">
-            {hearts.map((full, i) => (
-              <span key={`heart-${i + 1}`} style={{ fontSize: 18, filter: full ? 'none' : 'grayscale(1)', opacity: full ? 1 : 0.3 }}>
+            {hearts.map(({ key, full }) => (
+              <span key={key} style={{ fontSize: 18, filter: full ? 'none' : 'grayscale(1)', opacity: full ? 1 : 0.3 }}>
                 ❤️
               </span>
             ))}
