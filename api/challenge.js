@@ -21,12 +21,18 @@ export default async function handler(req, res) {
       }),
     })
 
-    const data = await response.json()
-
     if (!response.ok) {
-      console.error('Anthropic rejected request:', JSON.stringify(data))
-      return res.status(response.status).json({ error: data.error?.message || 'Anthropic API error' })
+      const errText = await response.text()
+      let errorMessage = 'Anthropic API error'
+      try {
+        const errData = JSON.parse(errText)
+        errorMessage = errData.error?.message || errorMessage
+      } catch { /* non-JSON error body */ }
+      console.error('Anthropic rejected request:', errText)
+      return res.status(response.status).json({ error: errorMessage })
     }
+
+    const data = await response.json()
     res.json(data)
   } catch (err) {
     console.error('API error:', err)
