@@ -26,13 +26,17 @@
 - `WorldComplete.jsx` — staggered star animation, next-world unlock message, final-world crown + "You completed World Quest!"
 - `GameComplete.jsx` — animated confetti, hero title, world emoji row with stars, total XP
 
-**Phase 3 — Backend & Claude service (infrastructure complete)**
+**Phase 3 — Backend & Claude service (COMPLETE)**
 - `server/index.js` — Express proxy; POST `/api/challenge` → Anthropic API; API key stays server-side
 - `api/challenge.js` — Vercel serverless handler mirroring Express proxy
 - `src/services/claude.js` — `fetchChallenge({ hero, world, challengeNumber })` — calls proxy, parses JSON response
 - `src/constants/prompts.js` — `buildSystemPrompt()` — world lock, hero class voice, challenge type rules, JSON-only output contract
+- `src/hooks/useChallenge.js` — fetch + prefetch hook; `fetchChallenge`, `prefetchNext`, `clearChallenge`; world guarded by WORLD_MAP lookup
+- `WorldEntry.jsx` — fetches challenge 1 on mount, shows world loading message while loading, retry button on error
+- `ResultScreen.jsx` — prefetches next challenge in background; Continue button waits for prefetch then passes data to `continueFromResult`
+- `MOCK_CHALLENGES` removed from `useGameState.js`; live Claude questions flowing through all worlds ✅
 
-**Phase 4 — Game logic (fully wired to mock data)**
+**Phase 4 — Game logic (fully wired to live Claude data)**
 - `useGameState.js` — complete state machine: XP, levelling (Apprentice → Explorer → Champion → Legend), world unlock, star rating, 2 attempts/normal + 1 attempt/boss, hint-on-first-wrong, `levelledUp` flag, `getNextWorld()` helper
 - Wrong answer → hint shown → second attempt ✅
 - Boss (challenge 4) gets 1 attempt, no hint ✅
@@ -52,9 +56,11 @@
 - HeroBar XP number: rAF count-up animation over 800ms with cubic ease
 - World-specific loading messages defined in `src/worlds/index.js`
 - WorldMap zone animations: `goldPulse` (active zones) + `bob` (available zones)
+- WorldEntry shows world-specific loading message while fetching challenge 1 from Claude
 
 **Testing & CI**
 - Vitest suite: 33 tests across `useGameState`, `claude.service`, `prompts` — all passing
+- Tests updated to use local TEST_CHALLENGES fixtures (MOCK_CHALLENGES no longer in production code)
 - GitHub Actions CI pipeline live (`test-and-build`, `deploy`, `preview` jobs)
 - Vercel serverless deployment config (`vercel.json`, `api/challenge.js`)
 - SonarCloud CPD exclusions added to pass duplication quality gate
@@ -63,22 +69,9 @@
 
 ### ⚠️ Done — Needs Attention
 
-**Phase 3 partial — live Claude questions not wired**
-- `server/index.js` and `src/services/claude.js` are fully built but `useGameState.js` still reads from `MOCK_CHALLENGES`
-- No UI error state when API call fails (error thrown but not displayed to player)
-
 **Phase 6 partial — polish items outstanding**
-- Loading state UI not shown to player (loading messages defined in worlds config but no spinner/loading screen rendered)
 - Map world-unlock animation (visual celebration when a new world opens) not implemented
 - Level-up celebration animation (beyond the banner text) not implemented
-
----
-
-### 🔨 In Progress
-
-**Phase 3 — wiring live Claude questions**
-- `useChallenge.js` hook needs to be created: fetch + prefetch logic to hide Claude latency during result screen
-- `useGameState.js` `enterWorld()` and `continueFromResult()` need to call `fetchChallenge` instead of reading from `MOCK_CHALLENGES`
 
 ---
 
@@ -91,14 +84,21 @@
 
 ## Known Issues
 
+**Egypt questions in all worlds — FIXED**
+Root cause: `MOCK_CHALLENGES` was hardcoded in `useGameState.js` and served questions for every world regardless of `activeWorldId`. Claude was never being called. Fixed by implementing `useChallenge.js` and removing mock data. `WorldEntry` now fetches challenge 1 on mount; `ResultScreen` prefetches the next challenge during the result screen to hide latency.
+
 **WorldMap zone positions may need device tuning**
 `ZONE_POSITIONS` in `src/components/WorldMap.jsx` are percentage coordinates hand-tuned against `world-map.png` at desktop resolution. The inner box is aspect-ratio-locked to `1448/1086` so overlays shouldn't drift, but minor position adjustments may be needed once tested on the actual iPad.
 
-**No player-facing error UI**
-If the Claude API call fails (network error, API key issue, etc.), `fetchChallenge` throws an error that currently has no UI handler. Once live Claude is wired, an error screen or retry prompt should be added.
+**No player-facing error UI (partial)**
+If the Claude API call fails, `WorldEntry` now shows a retry button. `ResultScreen` prefetch failure silently falls back to a fresh fetch on Continue. No full error screen exists yet for mid-challenge failures.
 
 ---
 
 ## Next Session — Pick Up From Here
 
-**Create `src/hooks/useChallenge.js`** — the only remaining Phase 3 task. The hook should: (1) call `fetchChallenge` from `claude.js`, (2) prefetch the next challenge during the result screen to hide Claude's 2–3s latency, (3) expose `isLoadingChallenge` and `challengeError` state. Then update `useGameState.js` `enterWorld()` and `continueFromResult()` to use it instead of `MOCK_CHALLENGES`. Once this is done, the game is fully live with Claude-generated questions.
+**Phase 6 Polish** — the game is fully live. Remaining polish items:
+- Map world-unlock celebration animation (visual pop when a new world opens)
+- Level-up celebration animation (beyond the current banner)
+- iPad viewport meta tags (`user-scalable=no`, `viewport-fit=cover`) in `index.html`
+- Test on actual iPad — check zone positions, touch targets, font sizes

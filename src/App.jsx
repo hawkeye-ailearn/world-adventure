@@ -61,6 +61,7 @@ export default function App() {
       {phase === 'world-entry' && activeWorld && (
         <WorldEntry
           world={activeWorld}
+          hero={hero}
           onEnter={enterWorld}
         />
       )}
