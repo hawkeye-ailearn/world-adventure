@@ -137,8 +137,23 @@ export default function ChallengeScreen({ hero, world, currentChallenge, onAnswe
 }
 
 ChallengeScreen.propTypes = {
-  hero: PropTypes.object.isRequired,
-  world: PropTypes.object.isRequired,
+  hero: PropTypes.shape({
+    name: PropTypes.string,
+    class: PropTypes.string,
+    level: PropTypes.number,
+    title: PropTypes.string,
+    totalXP: PropTypes.number,
+  }).isRequired,
+  world: PropTypes.shape({
+    lightBg: PropTypes.string.isRequired,
+    darkBg: PropTypes.string.isRequired,
+    emoji: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    textLight: PropTypes.string.isRequired,
+    borderColor: PropTypes.string.isRequired,
+    textDark: PropTypes.string.isRequired,
+    Scene: PropTypes.elementType.isRequired,
+  }).isRequired,
   currentChallenge: PropTypes.shape({
     data: PropTypes.shape({
       challengeType: PropTypes.string,

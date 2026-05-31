@@ -140,7 +140,10 @@ WorldEntry.propTypes = {
     loadingMessage: PropTypes.string,
     Scene: PropTypes.elementType.isRequired,
   }).isRequired,
-  hero: PropTypes.object.isRequired,
+  hero: PropTypes.shape({
+    name: PropTypes.string,
+    class: PropTypes.string,
+  }).isRequired,
   roundNumber: PropTypes.number,
   onEnter: PropTypes.func.isRequired,
 }
