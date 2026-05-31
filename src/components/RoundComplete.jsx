@@ -1,4 +1,6 @@
 import HeroBar from './HeroBar.jsx'
+import WorldBar from './WorldBar.jsx'
+import LevelUpBanner from './LevelUpBanner.jsx'
 import { ROUND_NAMES } from '../utils/rounds.js'
 
 function StarDrop({ index, filled, accentColor }) {
@@ -38,15 +40,7 @@ export default function RoundComplete({
       <HeroBar hero={hero} />
 
       {/* World bar */}
-      <div
-        className="flex items-center gap-3 px-4 py-2 shrink-0"
-        style={{ background: world.darkBg, minHeight: 44 }}
-      >
-        <span className="text-xl">{world.emoji}</span>
-        <span className="font-fredoka" style={{ color: world.textLight, fontSize: 16 }}>
-          {world.name}
-        </span>
-      </div>
+      <WorldBar world={world} />
 
       <div className="flex-1 flex flex-col items-center justify-center px-6 gap-5">
         {/* Round complete badge */}
@@ -98,22 +92,7 @@ export default function RoundComplete({
         )}
 
         {/* Level-up banner */}
-        {hero.levelledUp && (
-          <div
-            className="w-full rounded-2xl px-4 py-3 flex items-center gap-3"
-            style={{ background: '#2a1060', border: '2px solid #a855f7' }}
-          >
-            <span style={{ fontSize: 28 }}>🎉</span>
-            <div>
-              <p className="font-fredoka" style={{ color: '#e9d5ff', fontSize: 18 }}>
-                Level Up!
-              </p>
-              <p className="font-nunito text-sm" style={{ color: '#c4b5fd' }}>
-                You are now a <strong>{hero.title}</strong>!
-              </p>
-            </div>
-          </div>
-        )}
+        <LevelUpBanner hero={hero} />
 
         {/* Next round preview (only if not last round) */}
         {!isLastRound && (
