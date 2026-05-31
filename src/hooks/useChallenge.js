@@ -5,6 +5,11 @@ import { ROUND_NAMES, totalChallengesInRound } from '../utils/rounds.js'
 
 const WORLD_MAP = Object.fromEntries(worlds.map(w => [w.id, w]))
 
+function resolveRound(roundNumber) {
+  const rn = roundNumber ?? 1
+  return { rn, roundName: ROUND_NAMES[rn - 1] ?? 'Explorer', total: totalChallengesInRound(rn) }
+}
+
 export default function useChallenge() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -14,9 +19,7 @@ export default function useChallenge() {
   const fetchChallenge = useCallback(async ({ hero, worldId, roundNumber, challengeNumber }) => {
     const world = WORLD_MAP[worldId]
     if (!world) throw new Error(`No world configured for worldId: "${worldId}"`)
-    const rn = roundNumber ?? 1
-    const roundName = ROUND_NAMES[rn - 1] ?? 'Explorer'
-    const total = totalChallengesInRound(rn)
+    const { rn, roundName, total } = resolveRound(roundNumber)
     setIsLoading(true)
     setError(null)
     try {
@@ -32,13 +35,10 @@ export default function useChallenge() {
   }, [])
 
   const prefetchNext = useCallback(({ hero, worldId, roundNumber, nextChallengeNumber }) => {
-    const rn = roundNumber ?? 1
-    const max = totalChallengesInRound(rn)
-    if (nextChallengeNumber > max) return Promise.resolve(null)
+    const { rn, roundName, total } = resolveRound(roundNumber)
+    if (nextChallengeNumber > total) return Promise.resolve(null)
     const world = WORLD_MAP[worldId]
     if (!world) return Promise.resolve(null)
-    const roundName = ROUND_NAMES[rn - 1] ?? 'Explorer'
-    const total = totalChallengesInRound(rn)
     const p = generateChallenge({ hero, world, roundNumber: rn, roundName, challengeNumber: nextChallengeNumber, totalChallengesInRound: total }).catch(() => null)
     prefetchedRef.current = p
     return p
