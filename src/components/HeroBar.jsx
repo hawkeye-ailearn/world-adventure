@@ -21,18 +21,22 @@ export default function HeroBar({ hero }) {
 
     const duration = 800
     const startTime = performance.now()
+    let rafId
 
     function tick(now) {
       const elapsed = now - startTime
       const progress = Math.min(elapsed / duration, 1)
-      // ease-out cubic
       const eased = 1 - Math.pow(1 - progress, 3)
       setDisplayXP(Math.round(start + (end - start) * eased))
-      if (progress < 1) requestAnimationFrame(tick)
+      if (progress < 1) rafId = requestAnimationFrame(tick)
       else prevXPRef.current = end
     }
 
-    requestAnimationFrame(tick)
+    rafId = requestAnimationFrame(tick)
+    return () => {
+      cancelAnimationFrame(rafId)
+      prevXPRef.current = end
+    }
   }, [totalXP])
 
   return (
