@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import PropTypes from 'prop-types'
 import useChallenge from '../hooks/useChallenge.js'
 
 export default function WorldEntry({ world, hero, roundNumber, onEnter }) {
@@ -69,8 +70,8 @@ export default function WorldEntry({ world, hero, roundNumber, onEnter }) {
 
         {/* Challenge preview */}
         <div className="flex justify-center gap-3 py-3">
-          {['📜', '🔢', '🌍', '🔬', '⚡'].map((icon, i) => (
-            <div key={i} className="flex flex-col items-center gap-1">
+          {[{ icon: '📜', id: 'history' }, { icon: '🔢', id: 'maths' }, { icon: '🌍', id: 'general' }, { icon: '🔬', id: 'science' }, { icon: '⚡', id: 'mixed' }].map(({ icon, id }, i) => (
+            <div key={id} className="flex flex-col items-center gap-1">
               <div
                 className="w-10 h-10 rounded-full flex items-center justify-center text-lg"
                 style={{ background: world.darkBg, border: `2px solid ${world.borderColor}` }}
@@ -124,4 +125,25 @@ export default function WorldEntry({ world, hero, roundNumber, onEnter }) {
       </div>
     </div>
   )
+}
+
+WorldEntry.propTypes = {
+  world: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    emoji: PropTypes.string.isRequired,
+    lightBg: PropTypes.string.isRequired,
+    darkBg: PropTypes.string.isRequired,
+    textLight: PropTypes.string.isRequired,
+    textDark: PropTypes.string.isRequired,
+    borderColor: PropTypes.string.isRequired,
+    loadingMessage: PropTypes.string,
+    Scene: PropTypes.elementType.isRequired,
+  }).isRequired,
+  hero: PropTypes.shape({
+    name: PropTypes.string,
+    class: PropTypes.string,
+  }).isRequired,
+  roundNumber: PropTypes.number,
+  onEnter: PropTypes.func.isRequired,
 }

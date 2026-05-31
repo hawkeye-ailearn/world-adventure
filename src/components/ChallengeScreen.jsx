@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import HeroBar from './HeroBar.jsx'
 import MCQInput from './MCQInput.jsx'
 import NumberPad from './NumberPad.jsx'
@@ -18,7 +19,7 @@ export default function ChallengeScreen({ hero, world, currentChallenge, onAnswe
   const meta = CHALLENGE_LABELS[challengeNumber] ?? { label: 'Challenge', icon: '❓' }
 
   const maxAttempts = isBoss ? 1 : 2
-  const hearts = Array.from({ length: maxAttempts }, (_, i) => i < attemptsLeft)
+  const hearts = Array.from({ length: maxAttempts }, (_, i) => ({ key: `heart-${i + 1}`, full: i < attemptsLeft }))
 
   // Which option index was the wrong first answer (so it stays red on 2nd attempt)
   const wrongIndex =
@@ -58,8 +59,8 @@ export default function ChallengeScreen({ hero, world, currentChallenge, onAnswe
             {meta.icon} {meta.label}
           </span>
           <div className="flex gap-1 ml-2">
-            {hearts.map((full, i) => (
-              <span key={i} style={{ fontSize: 18, filter: full ? 'none' : 'grayscale(1)', opacity: full ? 1 : 0.3 }}>
+            {hearts.map(({ key, full }) => (
+              <span key={key} style={{ fontSize: 18, filter: full ? 'none' : 'grayscale(1)', opacity: full ? 1 : 0.3 }}>
                 ❤️
               </span>
             ))}
@@ -133,4 +134,44 @@ export default function ChallengeScreen({ hero, world, currentChallenge, onAnswe
       </div>
     </div>
   )
+}
+
+ChallengeScreen.propTypes = {
+  hero: PropTypes.shape({
+    name: PropTypes.string,
+    class: PropTypes.string,
+    level: PropTypes.number,
+    title: PropTypes.string,
+    totalXP: PropTypes.number,
+  }).isRequired,
+  world: PropTypes.shape({
+    lightBg: PropTypes.string.isRequired,
+    darkBg: PropTypes.string.isRequired,
+    emoji: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    textLight: PropTypes.string.isRequired,
+    borderColor: PropTypes.string.isRequired,
+    textDark: PropTypes.string.isRequired,
+    Scene: PropTypes.elementType.isRequired,
+  }).isRequired,
+  currentChallenge: PropTypes.shape({
+    data: PropTypes.shape({
+      challengeType: PropTypes.string,
+      answerFormat: PropTypes.string,
+      narrative: PropTypes.string,
+      question: PropTypes.string,
+      options: PropTypes.arrayOf(PropTypes.string),
+      hint: PropTypes.string,
+      correctAnswer: PropTypes.string,
+    }).isRequired,
+    challengeNumber: PropTypes.number.isRequired,
+    roundNumber: PropTypes.number,
+    roundName: PropTypes.string,
+    totalChallengesInRound: PropTypes.number,
+    attemptsLeft: PropTypes.number.isRequired,
+    hintShown: PropTypes.bool,
+    selectedAnswer: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    isCorrect: PropTypes.bool,
+  }).isRequired,
+  onAnswer: PropTypes.func.isRequired,
 }

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import PropTypes from 'prop-types'
 import HeroBar from './HeroBar.jsx'
 import WorldBar from './WorldBar.jsx'
 import LevelUpBanner from './LevelUpBanner.jsx'
@@ -192,4 +193,38 @@ export default function ResultScreen({ hero, world, currentChallenge, onContinue
       </div>
     </div>
   )
+}
+
+ResultScreen.propTypes = {
+  hero: PropTypes.shape({
+    name: PropTypes.string,
+    class: PropTypes.string,
+    levelledUp: PropTypes.bool,
+    title: PropTypes.string,
+    totalXP: PropTypes.number,
+  }).isRequired,
+  world: PropTypes.shape({
+    lightBg: PropTypes.string.isRequired,
+    darkBg: PropTypes.string.isRequired,
+    emoji: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    textLight: PropTypes.string.isRequired,
+    borderColor: PropTypes.string.isRequired,
+    textDark: PropTypes.string.isRequired,
+    loadingMessage: PropTypes.string,
+  }).isRequired,
+  currentChallenge: PropTypes.shape({
+    data: PropTypes.shape({
+      challengeType: PropTypes.string,
+      xp: PropTypes.number,
+      reaction: PropTypes.string,
+      correctAnswer: PropTypes.string,
+      funFact: PropTypes.string,
+    }).isRequired,
+    challengeNumber: PropTypes.number.isRequired,
+    roundNumber: PropTypes.number,
+    isCorrect: PropTypes.bool,
+    xpEarned: PropTypes.number,
+  }).isRequired,
+  onContinue: PropTypes.func.isRequired,
 }

@@ -50,6 +50,51 @@ function buildWorldState() {
   }))
 }
 
+function incrementFirstAttempt(worldStates, worldId, roundNumber) {
+  return worldStates.map(w => {
+    if (w.id !== worldId) return w
+    return {
+      ...w,
+      rounds: w.rounds.map(r =>
+        r.number === roundNumber ? { ...r, firstAttemptCorrect: r.firstAttemptCorrect + 1 } : r
+      ),
+    }
+  })
+}
+
+function buildCompletedWorldStates(prev, worldId, currentRound, worlds) {
+  const updated = prev.map(w => {
+    if (w.id !== worldId) return w
+    const roundIdx = w.rounds.findIndex(r => r.number === currentRound)
+    const round = w.rounds[roundIdx]
+    let stars = 1
+    if (round.firstAttemptCorrect >= 4) stars = 3
+    else if (round.firstAttemptCorrect >= 3) stars = 2
+    const updatedRounds = w.rounds.map((r, i) =>
+      i === roundIdx ? { ...r, completed: true, starsEarned: stars } : r
+    )
+    if (currentRound < 3) {
+      return { ...w, rounds: updatedRounds, currentRound: currentRound + 1 }
+    }
+    const totalStars = Math.round(updatedRounds.reduce((sum, r) => sum + r.starsEarned, 0) / 3)
+    return {
+      ...w,
+      rounds: updatedRounds,
+      completed: true,
+      starsEarned: totalStars,
+      challengesCompleted: 5 + 5 + 6,
+      xpEarned: w.xpEarned,
+    }
+  })
+  if (currentRound === 3) {
+    const currentIdx = worlds.findIndex(w => w.id === worldId)
+    if (currentIdx + 1 < worlds.length) {
+      updated[currentIdx + 1] = { ...updated[currentIdx + 1], unlocked: true }
+    }
+  }
+  return updated
+}
+
 export default function useGameState() {
   const [phase, setPhase] = useState('landing')
   const [hero, setHeroState] = useState({
@@ -112,20 +157,7 @@ export default function useGameState() {
     if (isCorrect) {
       // Track first-attempt correct for star rating — on the current round
       if (isFirstAttempt) {
-        setWorldStates(ws =>
-          ws.map(w =>
-            w.id === activeWorldId
-              ? {
-                  ...w,
-                  rounds: w.rounds.map(r =>
-                    r.number === currentRound
-                      ? { ...r, firstAttemptCorrect: r.firstAttemptCorrect + 1 }
-                      : r
-                  ),
-                }
-              : w
-          )
-        )
+        setWorldStates(ws => incrementFirstAttempt(ws, activeWorldId, currentRound))
       }
 
       // Award XP and recalculate level
@@ -201,47 +233,7 @@ export default function useGameState() {
   }
 
   function completeCurrentRound() {
-    setWorldStates(prev => {
-      const updated = prev.map(w => {
-        if (w.id !== activeWorldId) return w
-        const roundIdx = w.rounds.findIndex(r => r.number === currentRound)
-        const round = w.rounds[roundIdx]
-        const firstAttemptCount = round.firstAttemptCorrect
-        const stars = firstAttemptCount >= 4 ? 3 : firstAttemptCount >= 3 ? 2 : 1
-        const updatedRounds = w.rounds.map((r, i) =>
-          i === roundIdx ? { ...r, completed: true, starsEarned: stars } : r
-        )
-
-        if (currentRound < 3) {
-          // Not the last round — advance currentRound
-          return { ...w, rounds: updatedRounds, currentRound: currentRound + 1 }
-        } else {
-          // Last round — world complete; roll up summary fields for WorldComplete + WorldMap
-          const totalStars = Math.round(
-            updatedRounds.reduce((sum, r) => sum + r.starsEarned, 0) / 3
-          )
-          const totalChallenges = 5 + 5 + 6 // rounds 1+2+3
-          return {
-            ...w,
-            rounds: updatedRounds,
-            completed: true,
-            starsEarned: totalStars,
-            challengesCompleted: totalChallenges,
-            xpEarned: w.xpEarned,
-          }
-        }
-      })
-
-      if (currentRound === 3) {
-        // Unlock next world
-        const currentIdx = worlds.findIndex(w => w.id === activeWorldId)
-        if (currentIdx + 1 < worlds.length) {
-          updated[currentIdx + 1] = { ...updated[currentIdx + 1], unlocked: true }
-        }
-      }
-
-      return updated
-    })
+    setWorldStates(prev => buildCompletedWorldStates(prev, activeWorldId, currentRound, worlds))
 
     if (currentRound < 3) {
       setCurrentRound(r => r + 1)

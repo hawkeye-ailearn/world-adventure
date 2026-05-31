@@ -5,9 +5,8 @@ import { ROUND_NAMES, totalChallengesInRound } from '../utils/rounds.js'
 
 const WORLD_MAP = Object.fromEntries(worlds.map(w => [w.id, w]))
 
-function resolveRound(roundNumber) {
-  const rn = roundNumber ?? 1
-  return { rn, roundName: ROUND_NAMES[rn - 1] ?? 'Explorer', total: totalChallengesInRound(rn) }
+function resolveRound(roundNumber = 1) {
+  return { rn: roundNumber, roundName: ROUND_NAMES[roundNumber - 1] ?? 'Explorer', total: totalChallengesInRound(roundNumber) }
 }
 
 export default function useChallenge() {

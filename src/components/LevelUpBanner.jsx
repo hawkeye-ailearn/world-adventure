@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types'
+
 export default function LevelUpBanner({ hero }) {
   if (!hero.levelledUp) return null
   return (
@@ -16,4 +18,11 @@ export default function LevelUpBanner({ hero }) {
       </div>
     </div>
   )
+}
+
+LevelUpBanner.propTypes = {
+  hero: PropTypes.shape({
+    levelledUp: PropTypes.bool,
+    title: PropTypes.string,
+  }).isRequired,
 }
