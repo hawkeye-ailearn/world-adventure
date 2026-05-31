@@ -114,6 +114,7 @@ export default function ChallengeScreen({ hero, world, currentChallenge, onAnswe
           />
         ) : (
           <NumberPad
+            key={attemptsLeft}
             onAnswer={onAnswer}
             correctAnswer={data.correctAnswer}
             world={world}
