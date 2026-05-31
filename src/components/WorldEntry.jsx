@@ -5,13 +5,17 @@ export default function WorldEntry({ world, hero, roundNumber, onEnter }) {
   const { fetchChallenge, clearChallenge, isLoading, error } = useChallenge()
   const [challengeData, setChallengeData] = useState(null)
 
-  useEffect(() => {
-    clearChallenge()
+  function loadChallenge() {
     setChallengeData(null)
     fetchChallenge({ hero, worldId: world.id, roundNumber: roundNumber ?? 1, challengeNumber: 1 })
       .then(data => setChallengeData(data))
       .catch(() => {})
-  }, [world.id, roundNumber, clearChallenge, fetchChallenge])
+  }
+
+  useEffect(() => {
+    clearChallenge()
+    loadChallenge()
+  }, [world.id, roundNumber, clearChallenge, fetchChallenge]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const { Scene } = world
 
@@ -83,12 +87,7 @@ export default function WorldEntry({ world, hero, roundNumber, onEnter }) {
         {/* Enter button / loading / error */}
         {error ? (
           <button
-            onClick={() => {
-              setChallengeData(null)
-              fetchChallenge({ hero, worldId: world.id, roundNumber: roundNumber ?? 1, challengeNumber: 1 })
-                .then(data => setChallengeData(data))
-                .catch(() => {})
-            }}
+            onClick={loadChallenge}
             className="w-full font-fredoka rounded-2xl"
             style={{
               background: '#A32D2D',

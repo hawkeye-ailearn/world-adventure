@@ -10,10 +10,10 @@ export default function ResultScreen({ hero, world, currentChallenge, onContinue
   const { prefetchNext, fetchChallenge } = useChallenge()
   const prefetchPromise = useRef(null)
   const [isPreparing, setIsPreparing] = useState(false)
+  const maxForRound = totalChallengesInRound(currentChallenge.roundNumber)
 
   useEffect(() => {
     const nextNum = currentChallenge.challengeNumber + 1
-    const maxForRound = totalChallengesInRound(currentChallenge.roundNumber)
     if (nextNum <= maxForRound) {
       prefetchPromise.current = prefetchNext({
         hero,
@@ -25,7 +25,6 @@ export default function ResultScreen({ hero, world, currentChallenge, onContinue
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   async function handleContinue() {
-    const maxForRound = totalChallengesInRound(currentChallenge.roundNumber)
     if (currentChallenge.challengeNumber >= maxForRound) {
       onContinue(null)
       return
