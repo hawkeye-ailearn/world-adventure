@@ -80,6 +80,7 @@ function buildWorldState() {
     starsEarned: 0,
     challengesCompleted: 0,
     firstAttemptCorrect: 0,
+    xpEarned: 0,
   }))
 }
 
@@ -92,6 +93,7 @@ export default function useGameState() {
     title: 'Apprentice',
     xp: 0,
     totalXP: 0,
+    levelledUp: false,
   })
   const [worldStates, setWorldStates] = useState(buildWorldState())
   const [activeWorldId, setActiveWorldId] = useState('egypt')
@@ -142,45 +144,84 @@ export default function useGameState() {
         ? parseInt(answer) === data.correctIndex
         : String(answer).trim() === String(data.correctAnswer).trim()
 
-    const maxAttempts = data.challengeType === 'boss' ? 1 : 2
+    const isBoss = data.challengeType === 'boss'
+    const maxAttempts = isBoss ? 1 : 2
     const isFirstAttempt = attemptsLeft === maxAttempts
     const xpEarned = isCorrect ? (isFirstAttempt ? data.xp : Math.floor(data.xp / 2)) : 0
 
-    setCurrentChallenge({
-      ...currentChallenge,
-      selectedAnswer: answer,
-      isCorrect,
-      xpEarned,
-      attemptsLeft: isCorrect ? attemptsLeft : attemptsLeft - 1,
-    })
+    if (isCorrect) {
+      // Track first-attempt correct for star rating
+      if (isFirstAttempt) {
+        setWorldStates(ws =>
+          ws.map(w =>
+            w.id === activeWorldId
+              ? { ...w, firstAttemptCorrect: w.firstAttemptCorrect + 1 }
+              : w
+          )
+        )
+      }
 
-    if (isCorrect && isFirstAttempt) {
-      setWorldStates(ws =>
-        ws.map(w => w.id === activeWorldId ? { ...w, firstAttemptCorrect: w.firstAttemptCorrect + 1 } : w)
-      )
-    }
-
-    if (xpEarned > 0) {
+      // Award XP and recalculate level
       setHeroState(h => {
         const newTotal = h.totalXP + xpEarned
         const rank = getTitleForXP(newTotal)
-        return { ...h, xp: h.xp + xpEarned, totalXP: newTotal, level: rank.level, title: rank.title }
+        const levelledUp = rank.level > h.level
+        return { ...h, xp: h.xp + xpEarned, totalXP: newTotal, level: rank.level, title: rank.title, levelledUp }
       })
-    }
 
-    setPhase('result')
+      // Track XP earned this world
+      setWorldStates(ws =>
+        ws.map(w =>
+          w.id === activeWorldId
+            ? { ...w, xpEarned: w.xpEarned + xpEarned }
+            : w
+        )
+      )
+
+      setCurrentChallenge({
+        ...currentChallenge,
+        selectedAnswer: answer,
+        isCorrect: true,
+        xpEarned,
+        attemptsLeft,
+      })
+      setPhase('result')
+    } else {
+      const newAttemptsLeft = attemptsLeft - 1
+
+      if (newAttemptsLeft > 0 && !isBoss) {
+        // Wrong on first attempt — stay on challenge, auto-show hint
+        setCurrentChallenge({
+          ...currentChallenge,
+          selectedAnswer: answer,
+          isCorrect: false,
+          attemptsLeft: newAttemptsLeft,
+          hintShown: true,
+          xpEarned: 0,
+        })
+        // Stay on 'challenge' phase — no setPhase call
+      } else {
+        // All attempts exhausted (or boss) — go to result
+        setCurrentChallenge({
+          ...currentChallenge,
+          selectedAnswer: answer,
+          isCorrect: false,
+          attemptsLeft: 0,
+          xpEarned: 0,
+        })
+        setPhase('result')
+      }
+    }
   }
 
   function showHint() {
     setCurrentChallenge(cc => cc ? { ...cc, hintShown: true } : cc)
   }
 
-  function tryAgain() {
-    setCurrentChallenge(cc => cc ? { ...cc, selectedAnswer: null, isCorrect: null } : cc)
-    setPhase('challenge')
-  }
-
   function continueFromResult() {
+    // Clear level-up flag for next challenge
+    setHeroState(h => ({ ...h, levelledUp: false }))
+
     const nextIndex = challengeIndex + 1
 
     if (nextIndex >= MOCK_CHALLENGES.length) {
@@ -224,7 +265,6 @@ export default function useGameState() {
   }
 
   function returnToMap() {
-    // Check if all worlds complete
     const allComplete = worldStates.every(w => w.completed)
     if (allComplete) {
       setPhase('game-complete')
@@ -239,6 +279,11 @@ export default function useGameState() {
 
   function getWorldState(worldId) {
     return worldStates.find(w => w.id === worldId)
+  }
+
+  function getNextWorld() {
+    const currentIdx = worlds.findIndex(w => w.id === activeWorldId)
+    return currentIdx + 1 < worlds.length ? worlds[currentIdx + 1] : null
   }
 
   return {
@@ -256,11 +301,11 @@ export default function useGameState() {
     enterWorld,
     submitAnswer,
     showHint,
-    tryAgain,
     continueFromResult,
     returnToMap,
     // Helpers
     getActiveWorld,
     getWorldState,
+    getNextWorld,
   }
 }

@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react'
 import HeroBar from './HeroBar.jsx'
 
-export default function WorldComplete({ hero, world, worldState, onReturnToMap }) {
-  const { starsEarned, challengesCompleted } = worldState
+export default function WorldComplete({ hero, world, worldState, nextWorld, onReturnToMap }) {
+  const { starsEarned, challengesCompleted, xpEarned } = worldState
   const [starsVisible, setStarsVisible] = useState(0)
+  const isFinalWorld = !nextWorld
 
   useEffect(() => {
-    // Animate stars appearing one by one
     let t = 0
     for (let i = 1; i <= starsEarned; i++) {
       t += 400
@@ -37,14 +37,21 @@ export default function WorldComplete({ hero, world, worldState, onReturnToMap }
 
       {/* Content */}
       <div className="flex-1 flex flex-col items-center justify-between px-6 py-5 overflow-hidden">
-        {/* Trophy */}
+        {/* Trophy + title */}
         <div className="flex flex-col items-center gap-3">
-          <span style={{ fontSize: 64 }}>🏆</span>
+          <span style={{ fontSize: 64 }}>{isFinalWorld ? '👑' : '🏆'}</span>
           <h3 className="font-fredoka text-center" style={{ color: world.textDark, fontSize: 26 }}>
-            {isAllThree ? "PERFECT!" : starsEarned === 2 ? "Great Job!" : "Well Done!"}
+            {isFinalWorld
+              ? 'You completed World Quest!'
+              : isAllThree ? "PERFECT!" : starsEarned === 2 ? "Great Job!" : "Well Done!"}
           </h3>
           <p className="font-nunito text-center text-sm" style={{ color: world.textDark, opacity: 0.7 }}>
-            You completed {challengesCompleted} challenges!
+            {challengesCompleted} challenges completed
+            {xpEarned > 0 && (
+              <span className="font-fredoka ml-2" style={{ color: world.accentColor }}>
+                +{xpEarned} XP
+              </span>
+            )}
           </p>
         </div>
 
@@ -66,18 +73,29 @@ export default function WorldComplete({ hero, world, worldState, onReturnToMap }
           ))}
         </div>
 
-        {/* Rating message */}
+        {/* Rating / next world message */}
         <div
           className="w-full rounded-2xl p-4 text-center"
           style={{ background: 'white', border: `2px solid ${world.borderColor}` }}
         >
-          <p className="font-fredoka" style={{ color: world.textDark, fontSize: 18 }}>
-            {isAllThree
-              ? "Amazing! You got almost everything right first try!"
-              : starsEarned === 2
-              ? "Great work! A few more tries next time!"
-              : "You finished! Keep practising to earn more stars!"}
-          </p>
+          {isFinalWorld ? (
+            <p className="font-fredoka" style={{ color: world.textDark, fontSize: 18 }}>
+              You are a true {hero.title}! The world bows before your wisdom! 🌍
+            </p>
+          ) : (
+            <>
+              <p className="font-fredoka" style={{ color: world.textDark, fontSize: 18 }}>
+                {isAllThree
+                  ? "Amazing! You got almost everything right first try!"
+                  : starsEarned === 2
+                  ? "Great work! A few more tries next time!"
+                  : "You finished! Keep practising to earn more stars!"}
+              </p>
+              <p className="font-nunito text-sm mt-2" style={{ color: world.accentColor, fontWeight: 700 }}>
+                🔓 You unlocked {nextWorld.name}! {nextWorld.emoji}
+              </p>
+            </>
+          )}
         </div>
 
         {/* Return button */}
@@ -95,7 +113,7 @@ export default function WorldComplete({ hero, world, worldState, onReturnToMap }
             boxShadow: '0 4px 20px #534AB755',
           }}
         >
-          Back to World Map 🗺️
+          {isFinalWorld ? 'See your final score 👑' : 'Back to World Map 🗺️'}
         </button>
       </div>
     </div>

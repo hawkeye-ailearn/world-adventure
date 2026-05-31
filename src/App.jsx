@@ -21,12 +21,11 @@ export default function App() {
     selectWorld,
     enterWorld,
     submitAnswer,
-    showHint,
-    tryAgain,
     continueFromResult,
     returnToMap,
     getActiveWorld,
     getWorldState,
+    getNextWorld,
   } = game
 
   const activeWorld = getActiveWorld()
@@ -72,7 +71,6 @@ export default function App() {
           world={activeWorld}
           currentChallenge={currentChallenge}
           onAnswer={submitAnswer}
-          onShowHint={showHint}
         />
       )}
 
@@ -82,7 +80,6 @@ export default function App() {
           world={activeWorld}
           currentChallenge={currentChallenge}
           onContinue={continueFromResult}
-          onTryAgain={tryAgain}
         />
       )}
 
@@ -91,6 +88,7 @@ export default function App() {
           hero={hero}
           world={activeWorld}
           worldState={getWorldState(activeWorld.id)}
+          nextWorld={getNextWorld()}
           onReturnToMap={returnToMap}
         />
       )}
