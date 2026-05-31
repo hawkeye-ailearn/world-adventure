@@ -1,15 +1,52 @@
+import { useEffect, useRef, useState } from 'react'
 import HeroBar from './HeroBar.jsx'
+import useChallenge from '../hooks/useChallenge.js'
 
 export default function ResultScreen({ hero, world, currentChallenge, onContinue }) {
   const { data, isCorrect, xpEarned } = currentChallenge
   const isBoss = data.challengeType === 'boss'
 
-  // Distinguish first-attempt correct (full XP) from second-attempt correct (half XP)
+  const { prefetchNext, fetchChallenge } = useChallenge()
+  const prefetchPromise = useRef(null)
+  const [isPreparing, setIsPreparing] = useState(false)
+
+  useEffect(() => {
+    const nextNum = currentChallenge.challengeNumber + 1
+    if (nextNum <= 4) {
+      prefetchPromise.current = prefetchNext({
+        hero,
+        worldId: world.id,
+        nextChallengeNumber: nextNum,
+      })
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  async function handleContinue() {
+    if (currentChallenge.challengeNumber >= 4) {
+      onContinue(null)
+      return
+    }
+    setIsPreparing(true)
+    let nextData = await prefetchPromise.current
+    if (!nextData) {
+      // Prefetch failed — fall back to a fresh fetch
+      try {
+        nextData = await fetchChallenge({
+          hero,
+          worldId: world.id,
+          challengeNumber: currentChallenge.challengeNumber + 1,
+        })
+      } catch {
+        setIsPreparing(false)
+        return // stay on result screen; player can tap Continue to retry
+      }
+    }
+    setIsPreparing(false)
+    onContinue(nextData)
+  }
+
   const isFirstAttempt = isCorrect && xpEarned === data.xp
 
-  // STATE A: correct first attempt
-  // STATE B: correct second attempt
-  // STATE C: both wrong
   const state = isCorrect ? (isFirstAttempt ? 'A' : 'B') : 'C'
 
   const resultConfig = {
@@ -94,7 +131,7 @@ export default function ResultScreen({ hero, world, currentChallenge, onContinue
           )}
         </div>
 
-        {/* XP earned — State A (gold) and B (silver) */}
+        {/* XP earned */}
         {xpEarned > 0 && (
           <div
             className="flex items-center gap-3 rounded-2xl px-5 py-3 w-full"
@@ -151,20 +188,22 @@ export default function ResultScreen({ hero, world, currentChallenge, onContinue
         {/* Action button */}
         <div className="flex flex-col gap-3 w-full mt-auto">
           <button
-            onClick={onContinue}
+            onClick={handleContinue}
+            disabled={isPreparing}
             className="w-full font-fredoka rounded-2xl"
             style={{
-              background: '#534AB7',
+              background: isPreparing ? '#8880cc' : '#534AB7',
               color: 'white',
               fontSize: 20,
               padding: '16px',
               minHeight: 60,
               border: 'none',
-              cursor: 'pointer',
-              boxShadow: '0 4px 20px #534AB755',
+              cursor: isPreparing ? 'not-allowed' : 'pointer',
+              boxShadow: isPreparing ? 'none' : '0 4px 20px #534AB755',
+              opacity: isPreparing ? 0.75 : 1,
             }}
           >
-            {state === 'C' ? 'Keep going →' : 'Continue →'}
+            {isPreparing ? world.loadingMessage : (state === 'C' ? 'Keep going →' : 'Continue →')}
           </button>
         </div>
       </div>

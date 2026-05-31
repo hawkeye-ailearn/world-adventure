@@ -1,4 +1,18 @@
-export default function WorldEntry({ world, onEnter }) {
+import { useEffect, useState } from 'react'
+import useChallenge from '../hooks/useChallenge.js'
+
+export default function WorldEntry({ world, hero, onEnter }) {
+  const { fetchChallenge, clearChallenge, isLoading, error } = useChallenge()
+  const [challengeData, setChallengeData] = useState(null)
+
+  useEffect(() => {
+    clearChallenge()
+    setChallengeData(null)
+    fetchChallenge({ hero, worldId: world.id, challengeNumber: 1 })
+      .then(data => setChallengeData(data))
+      .catch(() => {})
+  }, [world.id, clearChallenge, fetchChallenge])
+
   const { Scene } = world
 
   const ENTRY_NARRATIVE = {
@@ -66,23 +80,48 @@ export default function WorldEntry({ world, onEnter }) {
           ))}
         </div>
 
-        {/* Enter button */}
-        <button
-          onClick={onEnter}
-          className="w-full font-fredoka rounded-2xl"
-          style={{
-            background: '#534AB7',
-            color: 'white',
-            fontSize: 20,
-            padding: '16px',
-            minHeight: 60,
-            border: 'none',
-            cursor: 'pointer',
-            boxShadow: '0 4px 20px #534AB755',
-          }}
-        >
-          Enter {world.name}! {world.emoji}
-        </button>
+        {/* Enter button / loading / error */}
+        {error ? (
+          <button
+            onClick={() => {
+              setChallengeData(null)
+              fetchChallenge({ hero, worldId: world.id, challengeNumber: 1 })
+                .then(data => setChallengeData(data))
+                .catch(() => {})
+            }}
+            className="w-full font-fredoka rounded-2xl"
+            style={{
+              background: '#A32D2D',
+              color: 'white',
+              fontSize: 18,
+              padding: '16px',
+              minHeight: 60,
+              border: 'none',
+              cursor: 'pointer',
+            }}
+          >
+            Something went wrong — tap to retry
+          </button>
+        ) : (
+          <button
+            onClick={() => challengeData && onEnter(challengeData)}
+            disabled={isLoading || !challengeData}
+            className="w-full font-fredoka rounded-2xl"
+            style={{
+              background: isLoading || !challengeData ? '#8880cc' : '#534AB7',
+              color: 'white',
+              fontSize: 20,
+              padding: '16px',
+              minHeight: 60,
+              border: 'none',
+              cursor: isLoading || !challengeData ? 'not-allowed' : 'pointer',
+              boxShadow: isLoading || !challengeData ? 'none' : '0 4px 20px #534AB755',
+              opacity: isLoading || !challengeData ? 0.75 : 1,
+            }}
+          >
+            {isLoading ? world.loadingMessage : `Enter ${world.name}! ${world.emoji}`}
+          </button>
+        )}
       </div>
     </div>
   )

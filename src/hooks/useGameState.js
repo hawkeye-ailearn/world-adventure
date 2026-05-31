@@ -1,65 +1,6 @@
 import { useState } from 'react'
 import worlds from '../worlds/index.js'
 
-// Mock challenges used in Phase 2 (Claude API not wired yet)
-const MOCK_CHALLENGES = [
-  {
-    narrative:
-      "You stand before the Great Pyramid of Giza! The ancient stones shimmer in the desert sun. A temple guardian steps forward with a question!",
-    challengeType: 'history',
-    question: "Who built the Great Pyramid of Giza?",
-    answerFormat: 'mcq',
-    options: ['Ramesses II', 'Khufu', 'Tutankhamun', 'Cleopatra'],
-    correctIndex: 1,
-    correctAnswer: 'Khufu',
-    hint: "He was a pharaoh of the 4th dynasty — his name means 'protected by Khnum'.",
-    reaction: "Outstanding! You really know your pharaohs!",
-    funFact: "The Great Pyramid of Giza was built around 2560 BC and is the only surviving Wonder of the Ancient World!",
-    xp: 100,
-  },
-  {
-    narrative:
-      "The pyramid builders need your help counting stone blocks! The head architect looks at you with hopeful eyes.",
-    challengeType: 'math',
-    question: "How much is 24 + 37?",
-    answerFormat: 'number',
-    options: [],
-    correctIndex: null,
-    correctAnswer: '61',
-    hint: "Try adding the tens first: 20 + 30 = 50, then add the ones.",
-    reaction: "Brilliant! You're a maths master!",
-    funFact: "The ancient Egyptians invented one of the earliest decimal number systems over 5,000 years ago!",
-    xp: 100,
-  },
-  {
-    narrative:
-      "Deep inside a tomb, hieroglyphics glow on every wall. An ancient spirit guards the treasure with one last riddle!",
-    challengeType: 'general',
-    question: "What gift did the Nile give to Ancient Egypt every year?",
-    answerFormat: 'mcq',
-    options: ['Melting snow from mountains', 'Rich fertile soil from flooding', 'Golden nuggets', 'Cool river breezes'],
-    correctIndex: 1,
-    correctAnswer: 'Rich fertile soil from flooding',
-    hint: "Think about what a river leaves behind when its waters go back down.",
-    reaction: "Excellent! The Nile was the lifeblood of all Egypt!",
-    funFact: "The Nile's annual flood left behind rich dark soil called silt — so fertile that Egypt became the breadbasket of the ancient world!",
-    xp: 100,
-  },
-  {
-    narrative:
-      "The mighty Sphinx rises from the sand! Its eyes open for the first time in centuries. This is the BOSS CHALLENGE — prove you are worthy!",
-    challengeType: 'boss',
-    question: "How many faces does a pyramid have in total (including the base)?",
-    answerFormat: 'mcq',
-    options: ['3', '4', '5', '6'],
-    correctIndex: 2,
-    correctAnswer: '5',
-    hint: "Count the triangular sides AND the flat bottom — they're all faces!",
-    reaction: "LEGENDARY! The Sphinx bows before your incredible knowledge!",
-    funFact: "A square pyramid has 4 triangular faces plus 1 square base = 5 faces total. In maths this is called a square pyramid polyhedron!",
-    xp: 200,
-  },
-]
 
 const TITLES = [
   { min: 0,    max: 299,  title: 'Apprentice',  level: 1 },
@@ -119,19 +60,18 @@ export default function useGameState() {
     setPhase('world-entry')
   }
 
-  function enterWorld() {
-    const challenge = MOCK_CHALLENGES[0]
+  function enterWorld(challengeData) {
+    setChallengeIndex(0)
     setCurrentChallenge({
       worldId: activeWorldId,
       challengeNumber: 1,
-      data: challenge,
-      attemptsLeft: challenge.challengeType === 'boss' ? 1 : 2,
+      data: challengeData,
+      attemptsLeft: challengeData.challengeType === 'boss' ? 1 : 2,
       selectedAnswer: null,
       isCorrect: null,
       hintShown: false,
       xpEarned: 0,
     })
-    setChallengeIndex(0)
     setPhase('challenge')
   }
 
@@ -218,13 +158,14 @@ export default function useGameState() {
     setCurrentChallenge(cc => cc ? { ...cc, hintShown: true } : cc)
   }
 
-  function continueFromResult() {
-    // Clear level-up flag for next challenge
+  const TOTAL_CHALLENGES = 4
+
+  function continueFromResult(nextChallengeData) {
     setHeroState(h => ({ ...h, levelledUp: false }))
 
     const nextIndex = challengeIndex + 1
 
-    if (nextIndex >= MOCK_CHALLENGES.length) {
+    if (nextIndex >= TOTAL_CHALLENGES) {
       // World complete
       const ws = worldStates.find(w => w.id === activeWorldId)
       const firstAttemptCount = ws?.firstAttemptCorrect ?? 0
@@ -233,11 +174,10 @@ export default function useGameState() {
       setWorldStates(prev => {
         const updated = prev.map(w => {
           if (w.id === activeWorldId) {
-            return { ...w, completed: true, starsEarned: stars, challengesCompleted: MOCK_CHALLENGES.length }
+            return { ...w, completed: true, starsEarned: stars, challengesCompleted: TOTAL_CHALLENGES }
           }
           return w
         })
-        // Unlock next world
         const currentIdx = worlds.findIndex(w => w.id === activeWorldId)
         if (currentIdx + 1 < worlds.length) {
           updated[currentIdx + 1] = { ...updated[currentIdx + 1], unlocked: true }
@@ -247,14 +187,12 @@ export default function useGameState() {
 
       setPhase('world-complete')
     } else {
-      // Next challenge
-      const challenge = MOCK_CHALLENGES[nextIndex]
       setChallengeIndex(nextIndex)
       setCurrentChallenge({
         worldId: activeWorldId,
         challengeNumber: nextIndex + 1,
-        data: challenge,
-        attemptsLeft: challenge.challengeType === 'boss' ? 1 : 2,
+        data: nextChallengeData,
+        attemptsLeft: nextChallengeData.challengeType === 'boss' ? 1 : 2,
         selectedAnswer: null,
         isCorrect: null,
         hintShown: false,
