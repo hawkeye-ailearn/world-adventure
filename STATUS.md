@@ -13,7 +13,7 @@ Last updated: 2026-05-31 (CI fixes + SonarCloud merged)
 | Phase 1 | Project shell (Vite + Tailwind + Express, App.jsx phase router, HeroBar) | ✅ Complete |
 | Phase 2 | All screens with hardcoded/mock data | ✅ Complete |
 | Phase 3 | Wire Claude in (proxy, service, prompts, useChallenge hook, live questions) | 🟡 In Progress |
-| Phase 4 | Game logic (XP/levelling, hearts/attempts, hint flow, world unlock) | 🟡 In Progress |
+| Phase 4 | Game logic (XP/levelling, hearts/attempts, hint flow, world unlock) | ✅ Complete |
 | Phase 5 | Scene SVG art (all 5 worlds) | ✅ Complete |
 | Phase 6 | Polish (transitions, XP bar animation, loading UX, iPad viewport) | 🟡 In Progress |
 
