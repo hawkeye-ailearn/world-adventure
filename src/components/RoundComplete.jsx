@@ -1,6 +1,5 @@
 import HeroBar from './HeroBar.jsx'
-
-const ROUND_NAMES = ['Explorer', 'Adventurer', 'Champion']
+import { ROUND_NAMES } from '../utils/rounds.js'
 
 function StarDrop({ index, filled, accentColor }) {
   return (

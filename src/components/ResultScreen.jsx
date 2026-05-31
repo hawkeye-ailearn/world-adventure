@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import HeroBar from './HeroBar.jsx'
 import useChallenge from '../hooks/useChallenge.js'
+import { totalChallengesInRound } from '../utils/rounds.js'
 
 export default function ResultScreen({ hero, world, currentChallenge, onContinue }) {
   const { data, isCorrect, xpEarned } = currentChallenge
@@ -12,7 +13,7 @@ export default function ResultScreen({ hero, world, currentChallenge, onContinue
 
   useEffect(() => {
     const nextNum = currentChallenge.challengeNumber + 1
-    const maxForRound = currentChallenge.roundNumber === 3 ? 6 : 5
+    const maxForRound = totalChallengesInRound(currentChallenge.roundNumber)
     if (nextNum <= maxForRound) {
       prefetchPromise.current = prefetchNext({
         hero,
@@ -24,7 +25,7 @@ export default function ResultScreen({ hero, world, currentChallenge, onContinue
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   async function handleContinue() {
-    const maxForRound = currentChallenge.roundNumber === 3 ? 6 : 5
+    const maxForRound = totalChallengesInRound(currentChallenge.roundNumber)
     if (currentChallenge.challengeNumber >= maxForRound) {
       onContinue(null)
       return

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import worlds from '../worlds/index.js'
-
+import { ROUND_NAMES, totalChallengesInRound } from '../utils/rounds.js'
 
 const TITLES = [
   { min: 0,    max: 299,  title: 'Apprentice',  level: 1 },
@@ -8,15 +8,6 @@ const TITLES = [
   { min: 700,  max: 1199, title: 'Champion',    level: 3 },
   { min: 1200, max: Infinity, title: 'Legend',  level: 4 },
 ]
-
-const ROUND_NAMES = ['Explorer', 'Adventurer', 'Champion']
-
-const CHALLENGES_PER_ROUND = 5   // rounds 1+2: 5 challenges
-const BOSS_ROUND = 3              // round 3 has 6 (5 + boss)
-
-function totalChallengesInRound(roundNumber) {
-  return roundNumber === BOSS_ROUND ? 6 : CHALLENGES_PER_ROUND
-}
 
 function getTitleForXP(xp) {
   return TITLES.find(t => xp >= t.min && xp <= t.max) ?? TITLES[0]

@@ -1,13 +1,9 @@
 import { useState, useRef, useCallback } from 'react'
 import { fetchChallenge as generateChallenge } from '../services/claude.js'
 import worlds from '../worlds/index.js'
+import { ROUND_NAMES, totalChallengesInRound } from '../utils/rounds.js'
 
 const WORLD_MAP = Object.fromEntries(worlds.map(w => [w.id, w]))
-const ROUND_NAMES = ['Explorer', 'Adventurer', 'Champion']
-
-function totalInRound(roundNumber) {
-  return roundNumber === 3 ? 6 : 5
-}
 
 export default function useChallenge() {
   const [isLoading, setIsLoading] = useState(false)
@@ -20,7 +16,7 @@ export default function useChallenge() {
     if (!world) throw new Error(`No world configured for worldId: "${worldId}"`)
     const rn = roundNumber ?? 1
     const roundName = ROUND_NAMES[rn - 1] ?? 'Explorer'
-    const total = totalInRound(rn)
+    const total = totalChallengesInRound(rn)
     setIsLoading(true)
     setError(null)
     try {
@@ -37,12 +33,12 @@ export default function useChallenge() {
 
   const prefetchNext = useCallback(({ hero, worldId, roundNumber, nextChallengeNumber }) => {
     const rn = roundNumber ?? 1
-    const max = totalInRound(rn)
+    const max = totalChallengesInRound(rn)
     if (nextChallengeNumber > max) return Promise.resolve(null)
     const world = WORLD_MAP[worldId]
     if (!world) return Promise.resolve(null)
     const roundName = ROUND_NAMES[rn - 1] ?? 'Explorer'
-    const total = totalInRound(rn)
+    const total = totalChallengesInRound(rn)
     const p = generateChallenge({ hero, world, roundNumber: rn, roundName, challengeNumber: nextChallengeNumber, totalChallengesInRound: total }).catch(() => null)
     prefetchedRef.current = p
     return p
