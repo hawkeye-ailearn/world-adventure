@@ -13,6 +13,22 @@ function getTitleForXP(xp) {
   return TITLES.find(t => xp >= t.min && xp <= t.max) ?? TITLES[0]
 }
 
+function makeChallengeState(worldId, challengeNumber, roundNumber, data) {
+  return {
+    worldId,
+    challengeNumber,
+    roundNumber,
+    roundName: ROUND_NAMES[roundNumber - 1],
+    totalChallengesInRound: totalChallengesInRound(roundNumber),
+    data,
+    attemptsLeft: data.challengeType === 'boss' ? 1 : 2,
+    selectedAnswer: null,
+    isCorrect: null,
+    hintShown: false,
+    xpEarned: 0,
+  }
+}
+
 function buildRounds() {
   return ROUND_NAMES.map((name, i) => ({
     number: i + 1,
@@ -75,19 +91,7 @@ export default function useGameState() {
   function enterWorld(challengeData) {
     setChallengeIndex(0)
     setRoundXP(0)
-    setCurrentChallenge({
-      worldId: activeWorldId,
-      challengeNumber: 1,
-      roundNumber: currentRound,
-      roundName: ROUND_NAMES[currentRound - 1],
-      totalChallengesInRound: totalChallengesInRound(currentRound),
-      data: challengeData,
-      attemptsLeft: challengeData.challengeType === 'boss' ? 1 : 2,
-      selectedAnswer: null,
-      isCorrect: null,
-      hintShown: false,
-      xpEarned: 0,
-    })
+    setCurrentChallenge(makeChallengeState(activeWorldId, 1, currentRound, challengeData))
     setPhase('challenge')
   }
 
@@ -191,19 +195,7 @@ export default function useGameState() {
       completeCurrentRound()
     } else {
       setChallengeIndex(nextIndex)
-      setCurrentChallenge({
-        worldId: activeWorldId,
-        challengeNumber: nextIndex + 1,
-        roundNumber: currentRound,
-        roundName: ROUND_NAMES[currentRound - 1],
-        totalChallengesInRound: totalChallengesInRound(currentRound),
-        data: nextChallengeData,
-        attemptsLeft: nextChallengeData.challengeType === 'boss' ? 1 : 2,
-        selectedAnswer: null,
-        isCorrect: null,
-        hintShown: false,
-        xpEarned: 0,
-      })
+      setCurrentChallenge(makeChallengeState(activeWorldId, nextIndex + 1, currentRound, nextChallengeData))
       setPhase('challenge')
     }
   }
