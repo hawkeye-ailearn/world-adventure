@@ -6,7 +6,7 @@ export default function ResultScreen({ hero, world, currentChallenge, onContinue
   const { data, isCorrect, xpEarned } = currentChallenge
   const isBoss = data.challengeType === 'boss'
 
-  const { prefetchNext } = useChallenge()
+  const { prefetchNext, fetchChallenge } = useChallenge()
   const prefetchPromise = useRef(null)
   const [isPreparing, setIsPreparing] = useState(false)
 
@@ -27,7 +27,20 @@ export default function ResultScreen({ hero, world, currentChallenge, onContinue
       return
     }
     setIsPreparing(true)
-    const nextData = await prefetchPromise.current
+    let nextData = await prefetchPromise.current
+    if (!nextData) {
+      // Prefetch failed — fall back to a fresh fetch
+      try {
+        nextData = await fetchChallenge({
+          hero,
+          worldId: world.id,
+          challengeNumber: currentChallenge.challengeNumber + 1,
+        })
+      } catch {
+        setIsPreparing(false)
+        return // stay on result screen; player can tap Continue to retry
+      }
+    }
     setIsPreparing(false)
     onContinue(nextData)
   }
