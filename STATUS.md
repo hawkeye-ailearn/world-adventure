@@ -58,9 +58,20 @@
 - WorldMap zone animations: `goldPulse` (active zones) + `bob` (available zones)
 - WorldEntry shows world-specific loading message while fetching challenge 1 from Claude
 
+**3-Round Game Structure**
+- Each world now has 3 rounds (Explorer, Adventurer, Champion) × 5 challenges + 1 boss in round 3
+- Challenge types: history (Q1), math (Q2), general (Q3), science/geography (Q4), mixed (Q5), boss (Q6 round 3 only)
+- `useGameState.js` — round-based world state, `completeCurrentRound()`, `startNextRound()`, `roundXP` tracking
+- `RoundComplete.jsx` — new screen shown between rounds (stars, XP, level-up banner, next round preview)
+- `prompts.js` — XP-based difficulty section (Apprentice/Explorer/Champion/Legend) + round difficulty modifier
+- `HeroBar.jsx` — shows round name + challenge progress dots during challenges
+- `WorldMap.jsx` — round progress dots (●●○) under each world node
+- `ChallengeScreen.jsx` — updated for 6 challenge types; passes `challengeContext` to HeroBar
+- `ResultScreen.jsx` + `useChallenge.js` + `WorldEntry.jsx` — updated for round-aware prefetch/fetch
+
 **Testing & CI**
-- Vitest suite: 33 tests across `useGameState`, `claude.service`, `prompts` — all passing
-- Tests updated to use local TEST_CHALLENGES fixtures (MOCK_CHALLENGES no longer in production code)
+- Vitest suite: 37 tests across `useGameState`, `claude.service`, `prompts` — all passing
+- Tests updated for 3-round structure with round progression tests added
 - GitHub Actions CI pipeline live (`test-and-build`, `deploy`, `preview` jobs)
 - Vercel serverless deployment config (`vercel.json`, `api/challenge.js`)
 - SonarCloud CPD exclusions added to pass duplication quality gate
@@ -97,7 +108,14 @@ If the Claude API call fails, `WorldEntry` now shows a retry button. `ResultScre
 
 ## Next Session — Pick Up From Here
 
-**Phase 6 Polish** — the game is fully live. Remaining polish items:
+**Test the 3-round flow end to end** — first priority before further polish:
+- Egypt Round 1: 5 questions (history, math, general, science, mixed), RoundComplete screen shows
+- Egypt Round 2: 5 more, slightly harder, RoundComplete screen shows
+- Egypt Round 3: 5 + Boss (Q6), WorldComplete screen shows, Medieval unlocks
+- Medieval Round 1: Medieval-themed questions (not Egypt)
+
+**Remaining polish items:**
+- WorldEntry challenge preview icons updated to show 5 dots not 4 (done), but copy still says "BOSS" for Q4 label — consider updating to show round context
 - Map world-unlock celebration animation (visual pop when a new world opens)
 - Level-up celebration animation (beyond the current banner)
 - iPad viewport meta tags (`user-scalable=no`, `viewport-fit=cover`) in `index.html`
