@@ -84,7 +84,10 @@ export default function WorldMap({ worldStates, onSelectWorld }) {
             return (
               <div
                 key={world.id}
+                role="button"
+                tabIndex={unlocked ? 0 : -1}
                 onClick={() => { if (unlocked) onSelectWorld(world.id) }}
+                onKeyDown={(e) => { if (unlocked && (e.key === 'Enter' || e.key === ' ')) onSelectWorld(world.id) }}
                 style={{
                   position: 'absolute',
                   left: pos.left,
