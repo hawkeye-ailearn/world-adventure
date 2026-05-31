@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import PropTypes from 'prop-types'
 
 const CLASS_EMOJI = { warrior: '⚔️', wizard: '🧙', explorer: '🗺️' }
 
@@ -66,9 +67,9 @@ export default function HeroBar({ hero, challengeContext }) {
             Round {challengeContext.roundNumber} · {challengeContext.roundName}
           </span>
           <div className="flex gap-0.5 mt-0.5">
-            {Array.from({ length: challengeContext.totalChallengesInRound }).map((_, i) => (
+            {Array.from({ length: challengeContext.totalChallengesInRound }, (_, i) => `dot-${i + 1}`).map((dotKey, i) => (
               <span
-                key={i}
+                key={dotKey}
                 style={{
                   fontSize: 8,
                   color: i < challengeContext.challengeNumber ? '#f2cc60' : 'rgba(180,200,220,0.25)',
@@ -101,4 +102,20 @@ export default function HeroBar({ hero, challengeContext }) {
       </div>
     </div>
   )
+}
+
+HeroBar.propTypes = {
+  hero: PropTypes.shape({
+    name: PropTypes.string,
+    class: PropTypes.string,
+    level: PropTypes.number,
+    title: PropTypes.string,
+    totalXP: PropTypes.number,
+  }).isRequired,
+  challengeContext: PropTypes.shape({
+    roundNumber: PropTypes.number,
+    roundName: PropTypes.string,
+    challengeNumber: PropTypes.number,
+    totalChallengesInRound: PropTypes.number,
+  }),
 }

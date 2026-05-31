@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import HeroBar from './HeroBar.jsx'
 import MCQInput from './MCQInput.jsx'
 import NumberPad from './NumberPad.jsx'
@@ -59,7 +60,7 @@ export default function ChallengeScreen({ hero, world, currentChallenge, onAnswe
           </span>
           <div className="flex gap-1 ml-2">
             {hearts.map((full, i) => (
-              <span key={i} style={{ fontSize: 18, filter: full ? 'none' : 'grayscale(1)', opacity: full ? 1 : 0.3 }}>
+              <span key={`heart-${i + 1}`} style={{ fontSize: 18, filter: full ? 'none' : 'grayscale(1)', opacity: full ? 1 : 0.3 }}>
                 ❤️
               </span>
             ))}
@@ -133,4 +134,29 @@ export default function ChallengeScreen({ hero, world, currentChallenge, onAnswe
       </div>
     </div>
   )
+}
+
+ChallengeScreen.propTypes = {
+  hero: PropTypes.object.isRequired,
+  world: PropTypes.object.isRequired,
+  currentChallenge: PropTypes.shape({
+    data: PropTypes.shape({
+      challengeType: PropTypes.string,
+      answerFormat: PropTypes.string,
+      narrative: PropTypes.string,
+      question: PropTypes.string,
+      options: PropTypes.arrayOf(PropTypes.string),
+      hint: PropTypes.string,
+      correctAnswer: PropTypes.string,
+    }).isRequired,
+    challengeNumber: PropTypes.number.isRequired,
+    roundNumber: PropTypes.number,
+    roundName: PropTypes.string,
+    totalChallengesInRound: PropTypes.number,
+    attemptsLeft: PropTypes.number.isRequired,
+    hintShown: PropTypes.bool,
+    selectedAnswer: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    isCorrect: PropTypes.bool,
+  }).isRequired,
+  onAnswer: PropTypes.func.isRequired,
 }

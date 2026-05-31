@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import PropTypes from 'prop-types'
 import HeroBar from './HeroBar.jsx'
 import WorldBar from './WorldBar.jsx'
 import LevelUpBanner from './LevelUpBanner.jsx'
@@ -192,4 +193,17 @@ export default function ResultScreen({ hero, world, currentChallenge, onContinue
       </div>
     </div>
   )
+}
+
+ResultScreen.propTypes = {
+  hero: PropTypes.object.isRequired,
+  world: PropTypes.object.isRequired,
+  currentChallenge: PropTypes.shape({
+    data: PropTypes.object.isRequired,
+    challengeNumber: PropTypes.number.isRequired,
+    roundNumber: PropTypes.number,
+    isCorrect: PropTypes.bool,
+    xpEarned: PropTypes.number,
+  }).isRequired,
+  onContinue: PropTypes.func.isRequired,
 }

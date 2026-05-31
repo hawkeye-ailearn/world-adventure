@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import HeroBar from './HeroBar.jsx'
 import WorldBar from './WorldBar.jsx'
 import LevelUpBanner from './LevelUpBanner.jsx'
@@ -132,4 +133,28 @@ export default function RoundComplete({
       </div>
     </div>
   )
+}
+
+StarDrop.propTypes = {
+  index: PropTypes.number.isRequired,
+  filled: PropTypes.bool.isRequired,
+  accentColor: PropTypes.string.isRequired,
+}
+
+RoundComplete.propTypes = {
+  world: PropTypes.shape({
+    lightBg: PropTypes.string.isRequired,
+    accentColor: PropTypes.string.isRequired,
+    textDark: PropTypes.string.isRequired,
+    darkBg: PropTypes.string.isRequired,
+    borderColor: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+  }).isRequired,
+  hero: PropTypes.shape({
+    name: PropTypes.string,
+  }).isRequired,
+  roundNumber: PropTypes.number.isRequired,
+  starsEarned: PropTypes.number.isRequired,
+  xpEarnedThisRound: PropTypes.number.isRequired,
+  onContinue: PropTypes.func.isRequired,
 }

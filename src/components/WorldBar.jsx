@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types'
+
 export default function WorldBar({ world }) {
   return (
     <div
@@ -10,4 +12,13 @@ export default function WorldBar({ world }) {
       </span>
     </div>
   )
+}
+
+WorldBar.propTypes = {
+  world: PropTypes.shape({
+    darkBg: PropTypes.string.isRequired,
+    emoji: PropTypes.string.isRequired,
+    textLight: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+  }).isRequired,
 }
