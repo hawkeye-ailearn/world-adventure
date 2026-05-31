@@ -67,7 +67,9 @@ function buildCompletedWorldStates(prev, worldId, currentRound, worlds) {
     if (w.id !== worldId) return w
     const roundIdx = w.rounds.findIndex(r => r.number === currentRound)
     const round = w.rounds[roundIdx]
-    const stars = round.firstAttemptCorrect >= 4 ? 3 : round.firstAttemptCorrect >= 3 ? 2 : 1
+    let stars = 1
+    if (round.firstAttemptCorrect >= 4) stars = 3
+    else if (round.firstAttemptCorrect >= 3) stars = 2
     const updatedRounds = w.rounds.map((r, i) =>
       i === roundIdx ? { ...r, completed: true, starsEarned: stars } : r
     )
