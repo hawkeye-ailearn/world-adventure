@@ -4,9 +4,8 @@
 
 import worlds from '../worlds/index.js'
 
-export function buildSystemPrompt({ hero, world, challengeNumber }) {
-  const totalChallenges = 4
-  const isBoss = challengeNumber === totalChallenges
+export function buildSystemPrompt({ hero, world, roundNumber, roundName, challengeNumber, totalChallengesInRound }) {
+  const isBoss = challengeNumber === totalChallengesInRound && roundNumber === 3
 
   // All worlds that are NOT the current one — used in the forbidden list
   const otherWorlds = worlds.filter((w) => w.id !== world.id)
@@ -15,7 +14,9 @@ export function buildSystemPrompt({ hero, world, challengeNumber }) {
     1: 'HISTORY',
     2: 'MATHS',
     3: 'GENERAL KNOWLEDGE',
-    4: 'BOSS',
+    4: 'SCIENCE / GEOGRAPHY',
+    5: 'MIXED',
+    6: 'BOSS',
   }
 
   const classVoice = {
@@ -42,6 +43,30 @@ EXPLORER VOICE 🏹
 - Victory lines: "Another mystery solved!", "Your journal fills with another great discovery!"
 - Wrong answer hint tone: adventurous setback — "Your compass spins. Look again, Explorer..."`,
   }
+
+  const difficultyBlock = `
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+DIFFICULTY — Based on player level + round
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Player is: ${hero.title} (${hero.xp} XP)
+
+${hero.level === 1 ? `APPRENTICE LEVEL:
+- Maths: addition/subtraction to 50, 2× and 5× tables only
+- History: well-known facts, famous names
+- Simple vocabulary, short questions` : hero.level === 2 ? `EXPLORER LEVEL:
+- Maths: addition/subtraction to 100, 2× 3× 5× tables, simple word problems
+- History: slightly deeper facts, cause/effect
+- Moderate vocabulary` : hero.level === 3 ? `CHAMPION LEVEL:
+- Maths: multiplication to 10×, two-step word problems
+- History: deeper context, comparisons
+- Richer vocabulary, longer questions` : `LEGEND LEVEL:
+- Maths: multi-step problems, division, fractions (halves and quarters)
+- History: nuanced facts, "why" questions
+- Complex vocabulary, lateral thinking`}
+
+Round difficulty modifier:
+${roundNumber === 1 ? 'Round 1 (Explorer): Use the EASIER end of the difficulty range above.' : roundNumber === 2 ? 'Round 2 (Adventurer): Use the MIDDLE of the difficulty range above.' : 'Round 3 (Champion): Use the HARDER end of the difficulty range above.'}`
 
   return `You are the Game Master for "World Quest" — a fun, educational adventure game.
 
@@ -73,11 +98,13 @@ This rule overrides EVERYTHING else in this prompt.
 CURRENT SESSION
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-PLAYER : ${hero.name} the ${hero.class.charAt(0).toUpperCase() + hero.class.slice(1)}
-WORLD  : ${world.name}  ← ALL content must be set here
-CONTEXT: ${world.context}
-CHALLENGE : ${challengeNumber} of ${totalChallenges} — ${challengeTypeForNumber[challengeNumber]}${isBoss ? ' (BOSS ROUND — harder question, 2× XP)' : ''}
-LEVEL  : ${hero.title} (${hero.xp} XP)
+PLAYER    : ${hero.name} the ${hero.class.charAt(0).toUpperCase() + hero.class.slice(1)}
+WORLD     : ${world.name}  ← ALL content must be set here
+CONTEXT   : ${world.context}
+ROUND     : ${roundNumber} of 3 — ${roundName}
+CHALLENGE : ${challengeNumber} of ${totalChallengesInRound} — ${challengeTypeForNumber[challengeNumber]}${isBoss ? ' (BOSS ROUND — harder question, 2× XP)' : ''}
+LEVEL     : ${hero.title} (${hero.xp} XP)
+${difficultyBlock}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 YOUR ROLE
@@ -107,7 +134,7 @@ ${
   challengeNumber === 2
     ? `MATHS CHALLENGE
 - A word problem set inside ${world.name} using objects and characters from ${world.name}.
-- Grade 2–3 level ONLY:
+- Grade 2–3 level ONLY (adjusted by difficulty section above):
     * Addition or subtraction up to 100, OR
     * Multiplication using ONLY 2×, 3×, or 5× tables
 - The maths must feel natural to the world. Examples:
@@ -124,7 +151,7 @@ ${
 ${
   challengeNumber === 3
     ? `GENERAL KNOWLEDGE CHALLENGE
-- Ask about science, geography, or nature connected to ${world.name}.
+- Ask about culture, art, food, or daily life connected to ${world.name}.
 - A surprising, delightful fact — something a curious 7-year-old will love.
 - The question must feel at home inside ${world.name}.
 - answerFormat: "mcq"
@@ -133,15 +160,37 @@ ${
 }
 ${
   challengeNumber === 4
+    ? `SCIENCE / GEOGRAPHY CHALLENGE
+- A science or geography fact tied to ${world.name}.
+- Something visual and surprising that a curious 7-year-old will love.
+- Examples: how something works, an animal fact, a geography record, a natural wonder.
+- The question must feel at home inside ${world.name}.
+- answerFormat: "mcq"
+- 4 options: 1 correct + 3 plausible-but-wrong.`
+    : ''
+}
+${
+  challengeNumber === 5
+    ? `MIXED CHALLENGE
+- Pick whichever subject (history, maths, science, or general knowledge)
+  makes the most dramatic story moment for ${world.name} right now.
+- Slightly harder than challenges 1–4 to build tension before the round ends.
+- answerFormat: "mcq" or "number" — whichever fits the question best.
+- If maths: follow the same grade-level rules as challenge 2.
+- If mcq: 4 options: 1 correct + 3 plausible-but-wrong.`
+    : ''
+}
+${
+  isBoss
     ? `BOSS CHALLENGE — 2× XP
-- This is the dramatic CLIMAX of ${world.name}. Make it epic.
+- This is the dramatic CLIMAX of ${world.name} Round 3. Make it epic.
 - The boss must be a named character from ${world.name}:
     ${world.id === 'egypt' ? 'A mighty Pharaoh — Khufu, Ramesses, Tutankhamun, Cleopatra, etc.' : ''}
     ${world.id === 'medieval' ? 'A legendary Dragon Knight, the Black King, or a fearsome castle lord.' : ''}
     ${world.id === 'space' ? 'Commander Nova of the Space Station, or the AI overlord of the ship.' : ''}
     ${world.id === 'safari' ? 'The ancient Jungle Chief, keeper of all animal secrets.' : ''}
     ${world.id === 'india' ? 'Emperor Ashoka himself, the greatest ruler of Ancient India.' : ''}
-- Harder than previous challenges — but still Grade 2–3 maths if it is maths.
+- Harder than previous challenges — but still grade-appropriate if maths.
 - answerFormat: "mcq" or "number" — whichever fits the question better.
 - xp MUST be 200 for boss. No exceptions.`
     : ''
@@ -185,7 +234,7 @@ Valid JSON only. Nothing before the opening { and nothing after the closing }.
 
 {
   "narrative": "2-3 sentence story setup inside ${world.name}, ending on a hook",
-  "challengeType": "${challengeNumber === 1 ? 'history' : challengeNumber === 2 ? 'math' : challengeNumber === 3 ? 'general' : 'boss'}",
+  "challengeType": "${isBoss ? 'boss' : challengeNumber === 1 ? 'history' : challengeNumber === 2 ? 'math' : challengeNumber === 3 ? 'general' : challengeNumber === 4 ? 'science' : 'mixed'}",
   "question": "The exact question — must be about ${world.name} only",
   "answerFormat": "mcq | number",
   "options": ["Option A", "Option B", "Option C", "Option D"],
@@ -200,7 +249,7 @@ Valid JSON only. Nothing before the opening { and nothing after the closing }.
 FINAL CHECK BEFORE YOU RESPOND:
 ✓ Is every part of my response about ${world.name}?
 ✓ Have I avoided all references to ${otherWorlds.map((w) => w.name).join(', ')}?
-✓ Is challengeType exactly "${challengeNumber === 1 ? 'history' : challengeNumber === 2 ? 'math' : challengeNumber === 3 ? 'general' : 'boss'}"?
+✓ Is challengeType exactly "${isBoss ? 'boss' : challengeNumber === 1 ? 'history' : challengeNumber === 2 ? 'math' : challengeNumber === 3 ? 'general' : challengeNumber === 4 ? 'science' : 'mixed'}"?
 ✓ Is xp exactly ${isBoss ? 200 : 100}?
 ✓ Is my output valid JSON with no extra text around it?`
 }

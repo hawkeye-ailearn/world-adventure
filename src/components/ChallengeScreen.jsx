@@ -3,16 +3,18 @@ import MCQInput from './MCQInput.jsx'
 import NumberPad from './NumberPad.jsx'
 
 const CHALLENGE_LABELS = {
-  1: { label: 'History',      icon: '📜' },
-  2: { label: 'Maths',        icon: '🔢' },
-  3: { label: 'General',      icon: '🌍' },
-  4: { label: 'BOSS',         icon: '👾' },
+  1: { label: 'History',          icon: '📜' },
+  2: { label: 'Maths',            icon: '🔢' },
+  3: { label: 'General',          icon: '🌍' },
+  4: { label: 'Science',          icon: '🔬' },
+  5: { label: 'Mixed',            icon: '⚡' },
+  6: { label: 'BOSS',             icon: '👾' },
 }
 
 export default function ChallengeScreen({ hero, world, currentChallenge, onAnswer }) {
-  const { data, challengeNumber, attemptsLeft, hintShown, selectedAnswer, isCorrect } = currentChallenge
+  const { data, challengeNumber, roundNumber, roundName, totalChallengesInRound, attemptsLeft, hintShown, selectedAnswer, isCorrect } = currentChallenge
   const { Scene } = world
-  const isBoss = challengeNumber === 4
+  const isBoss = data.challengeType === 'boss'
   const meta = CHALLENGE_LABELS[challengeNumber] ?? { label: 'Challenge', icon: '❓' }
 
   const maxAttempts = isBoss ? 1 : 2
@@ -30,7 +32,15 @@ export default function ChallengeScreen({ hero, world, currentChallenge, onAnswe
       style={{ background: world.lightBg }}
     >
       {/* Hero bar */}
-      <HeroBar hero={hero} />
+      <HeroBar
+        hero={hero}
+        challengeContext={{
+          roundNumber,
+          roundName,
+          challengeNumber,
+          totalChallengesInRound,
+        }}
+      />
 
       {/* World bar */}
       <div

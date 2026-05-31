@@ -1,17 +1,21 @@
 import { useEffect, useState } from 'react'
 import useChallenge from '../hooks/useChallenge.js'
 
-export default function WorldEntry({ world, hero, onEnter }) {
+export default function WorldEntry({ world, hero, roundNumber, onEnter }) {
   const { fetchChallenge, clearChallenge, isLoading, error } = useChallenge()
   const [challengeData, setChallengeData] = useState(null)
 
-  useEffect(() => {
-    clearChallenge()
+  function loadChallenge() {
     setChallengeData(null)
-    fetchChallenge({ hero, worldId: world.id, challengeNumber: 1 })
+    fetchChallenge({ hero, worldId: world.id, roundNumber: roundNumber ?? 1, challengeNumber: 1 })
       .then(data => setChallengeData(data))
       .catch(() => {})
-  }, [world.id, clearChallenge, fetchChallenge])
+  }
+
+  useEffect(() => {
+    clearChallenge()
+    loadChallenge()
+  }, [world.id, roundNumber, clearChallenge, fetchChallenge]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const { Scene } = world
 
@@ -64,17 +68,17 @@ export default function WorldEntry({ world, hero, onEnter }) {
         </div>
 
         {/* Challenge preview */}
-        <div className="flex justify-center gap-6 py-3">
-          {['❓', '🔢', '🌍', '👾'].map((icon, i) => (
+        <div className="flex justify-center gap-3 py-3">
+          {['📜', '🔢', '🌍', '🔬', '⚡'].map((icon, i) => (
             <div key={i} className="flex flex-col items-center gap-1">
               <div
-                className="w-12 h-12 rounded-full flex items-center justify-center text-xl"
+                className="w-10 h-10 rounded-full flex items-center justify-center text-lg"
                 style={{ background: world.darkBg, border: `2px solid ${world.borderColor}` }}
               >
                 {icon}
               </div>
               <span className="font-nunito text-xs font-semibold" style={{ color: world.textDark, opacity: 0.6 }}>
-                {i === 3 ? 'BOSS' : `Q${i + 1}`}
+                Q{i + 1}
               </span>
             </div>
           ))}
@@ -83,12 +87,7 @@ export default function WorldEntry({ world, hero, onEnter }) {
         {/* Enter button / loading / error */}
         {error ? (
           <button
-            onClick={() => {
-              setChallengeData(null)
-              fetchChallenge({ hero, worldId: world.id, challengeNumber: 1 })
-                .then(data => setChallengeData(data))
-                .catch(() => {})
-            }}
+            onClick={loadChallenge}
             className="w-full font-fredoka rounded-2xl"
             style={{
               background: '#A32D2D',

@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import HeroBar from './HeroBar.jsx'
+import WorldBar from './WorldBar.jsx'
+import LevelUpBanner from './LevelUpBanner.jsx'
 import useChallenge from '../hooks/useChallenge.js'
+import { totalChallengesInRound } from '../utils/rounds.js'
 
 export default function ResultScreen({ hero, world, currentChallenge, onContinue }) {
   const { data, isCorrect, xpEarned } = currentChallenge
@@ -9,20 +12,22 @@ export default function ResultScreen({ hero, world, currentChallenge, onContinue
   const { prefetchNext, fetchChallenge } = useChallenge()
   const prefetchPromise = useRef(null)
   const [isPreparing, setIsPreparing] = useState(false)
+  const maxForRound = totalChallengesInRound(currentChallenge.roundNumber)
 
   useEffect(() => {
     const nextNum = currentChallenge.challengeNumber + 1
-    if (nextNum <= 4) {
+    if (nextNum <= maxForRound) {
       prefetchPromise.current = prefetchNext({
         hero,
         worldId: world.id,
+        roundNumber: currentChallenge.roundNumber,
         nextChallengeNumber: nextNum,
       })
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   async function handleContinue() {
-    if (currentChallenge.challengeNumber >= 4) {
+    if (currentChallenge.challengeNumber >= maxForRound) {
       onContinue(null)
       return
     }
@@ -34,6 +39,7 @@ export default function ResultScreen({ hero, world, currentChallenge, onContinue
         nextData = await fetchChallenge({
           hero,
           worldId: world.id,
+          roundNumber: currentChallenge.roundNumber,
           challengeNumber: currentChallenge.challengeNumber + 1,
         })
       } catch {
@@ -88,15 +94,7 @@ export default function ResultScreen({ hero, world, currentChallenge, onContinue
       <HeroBar hero={hero} />
 
       {/* World bar */}
-      <div
-        className="flex items-center gap-3 px-4 py-2 shrink-0"
-        style={{ background: world.darkBg, minHeight: 44 }}
-      >
-        <span className="text-xl">{world.emoji}</span>
-        <span className="font-fredoka" style={{ color: world.textLight, fontSize: 16 }}>
-          {world.name}
-        </span>
-      </div>
+      <WorldBar world={world} />
 
       {/* Main content */}
       <div className="flex-1 overflow-hidden flex flex-col items-center px-5 py-4 gap-4">
@@ -154,22 +152,7 @@ export default function ResultScreen({ hero, world, currentChallenge, onContinue
         )}
 
         {/* Level-up banner */}
-        {hero.levelledUp && (
-          <div
-            className="w-full rounded-2xl px-4 py-3 flex items-center gap-3"
-            style={{ background: '#2a1060', border: '2px solid #a855f7' }}
-          >
-            <span style={{ fontSize: 28 }}>🎉</span>
-            <div>
-              <p className="font-fredoka" style={{ color: '#e9d5ff', fontSize: 18 }}>
-                Level Up!
-              </p>
-              <p className="font-nunito text-sm" style={{ color: '#c4b5fd' }}>
-                You are now a <strong>{hero.title}</strong>!
-              </p>
-            </div>
-          </div>
-        )}
+        <LevelUpBanner hero={hero} />
 
         {/* Fun fact */}
         <div

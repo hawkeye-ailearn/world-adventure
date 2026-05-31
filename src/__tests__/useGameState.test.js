@@ -1,64 +1,60 @@
 import { renderHook, act } from '@testing-library/react'
 import useGameState from '../hooks/useGameState'
 
-// Test fixtures — minimal challenge data matching the expected correct answers below
-const TEST_CHALLENGES = [
-  {
-    narrative: 'History challenge',
-    challengeType: 'history',
-    question: 'Who built the Great Pyramid?',
-    answerFormat: 'mcq',
+// Test fixtures — one per challenge type
+const TC = {
+  history: {
+    narrative: 'History challenge', challengeType: 'history',
+    question: 'Who built the Great Pyramid?', answerFormat: 'mcq',
     options: ['Ramesses II', 'Khufu', 'Tutankhamun', 'Cleopatra'],
-    correctIndex: 1,
-    correctAnswer: 'Khufu',
-    hint: 'Hint 1',
-    reaction: 'Great!',
-    funFact: 'Fun fact 1',
-    xp: 100,
+    correctIndex: 1, correctAnswer: 'Khufu',
+    hint: 'Hint', reaction: 'Great!', funFact: 'Fun fact', xp: 100,
   },
-  {
-    narrative: 'Maths challenge',
-    challengeType: 'math',
-    question: 'How much is 24 + 37?',
-    answerFormat: 'number',
-    options: [],
-    correctIndex: null,
-    correctAnswer: '61',
-    hint: 'Hint 2',
-    reaction: 'Brilliant!',
-    funFact: 'Fun fact 2',
-    xp: 100,
+  math: {
+    narrative: 'Maths challenge', challengeType: 'math',
+    question: 'How much is 24 + 37?', answerFormat: 'number',
+    options: [], correctIndex: null, correctAnswer: '61',
+    hint: 'Hint', reaction: 'Brilliant!', funFact: 'Fun fact', xp: 100,
   },
-  {
-    narrative: 'General knowledge challenge',
-    challengeType: 'general',
-    question: 'What did the Nile give Egypt?',
-    answerFormat: 'mcq',
+  general: {
+    narrative: 'General knowledge', challengeType: 'general',
+    question: 'What did the Nile give Egypt?', answerFormat: 'mcq',
     options: ['Snow', 'Fertile soil', 'Gold', 'Breezes'],
-    correctIndex: 1,
-    correctAnswer: 'Fertile soil',
-    hint: 'Hint 3',
-    reaction: 'Excellent!',
-    funFact: 'Fun fact 3',
-    xp: 100,
+    correctIndex: 1, correctAnswer: 'Fertile soil',
+    hint: 'Hint', reaction: 'Excellent!', funFact: 'Fun fact', xp: 100,
   },
-  {
-    narrative: 'Boss challenge',
-    challengeType: 'boss',
-    question: 'How many faces does a pyramid have?',
-    answerFormat: 'mcq',
+  science: {
+    narrative: 'Science challenge', challengeType: 'science',
+    question: 'How hot is the Sahara?', answerFormat: 'mcq',
+    options: ['30°C', '50°C', '70°C', '10°C'],
+    correctIndex: 1, correctAnswer: '50°C',
+    hint: 'Hint', reaction: 'Wow!', funFact: 'Fun fact', xp: 100,
+  },
+  mixed: {
+    narrative: 'Mixed challenge', challengeType: 'mixed',
+    question: 'How many seasons does Egypt have?', answerFormat: 'mcq',
+    options: ['1', '2', '3', '4'],
+    correctIndex: 1, correctAnswer: '2',
+    hint: 'Hint', reaction: 'Amazing!', funFact: 'Fun fact', xp: 100,
+  },
+  boss: {
+    narrative: 'Boss challenge', challengeType: 'boss',
+    question: 'How many faces does a pyramid have?', answerFormat: 'mcq',
     options: ['3', '4', '5', '6'],
-    correctIndex: 2,
-    correctAnswer: '5',
-    hint: 'Hint 4',
-    reaction: 'Legendary!',
-    funFact: 'Fun fact 4',
-    xp: 200,
+    correctIndex: 2, correctAnswer: '5',
+    hint: 'Hint', reaction: 'Legendary!', funFact: 'Fun fact', xp: 200,
   },
-]
+}
 
-// Correct answers matching TEST_CHALLENGES order
-const CORRECT_ANSWERS = [1, '61', 1, 2]
+// Sequence for 3 rounds: R1 (5), R2 (5), R3 (6 incl boss)
+const ROUND1 = [TC.history, TC.math, TC.general, TC.science, TC.mixed]
+const ROUND2 = [TC.history, TC.math, TC.general, TC.science, TC.mixed]
+const ROUND3 = [TC.history, TC.math, TC.general, TC.science, TC.mixed, TC.boss]
+
+// Correct answers indexed to match each challenge
+function correctAnswer(tc) {
+  return tc.answerFormat === 'mcq' ? tc.correctIndex : tc.correctAnswer
+}
 
 function setup() {
   const { result } = renderHook(() => useGameState())
@@ -70,14 +66,36 @@ function setupWithHero(result) {
   act(() => result.current.createHero({ name: 'Madhav', heroClass: 'warrior' }))
 }
 
+// Play through all 5 challenges of a round, then call continueFromResult(null) at the end
+function playRound(result, challenges) {
+  challenges.forEach((challenge, i) => {
+    act(() => result.current.submitAnswer(correctAnswer(challenge)))
+    const isLast = i === challenges.length - 1
+    act(() => result.current.continueFromResult(isLast ? null : challenges[i + 1]))
+  })
+}
+
+// Play a full world (3 rounds) — caller must have already called selectWorld + enterWorld(ROUND1[0])
+function playWorldRounds(result) {
+  // Round 1
+  playRound(result, ROUND1)
+  // phase is now 'round-complete'; advance to round 2
+  act(() => result.current.startNextRound())
+  act(() => result.current.enterWorld(ROUND2[0]))
+  // Round 2
+  playRound(result, ROUND2)
+  // phase is now 'round-complete'; advance to round 3
+  act(() => result.current.startNextRound())
+  act(() => result.current.enterWorld(ROUND3[0]))
+  // Round 3 (6 challenges)
+  playRound(result, ROUND3)
+  // phase is now 'world-complete'
+}
+
 function playThroughWorld(result, worldId) {
   act(() => result.current.selectWorld(worldId))
-  act(() => result.current.enterWorld(TEST_CHALLENGES[0]))
-  CORRECT_ANSWERS.forEach((answer, i) => {
-    act(() => result.current.submitAnswer(answer))
-    act(() => result.current.continueFromResult(TEST_CHALLENGES[i + 1] ?? null))
-  })
-  // Last continueFromResult above triggered world-complete; now return to map
+  act(() => result.current.enterWorld(ROUND1[0]))
+  playWorldRounds(result)
   act(() => result.current.returnToMap())
 }
 
@@ -113,6 +131,13 @@ describe('Initial state', () => {
     const locked = result.current.worldStates.slice(1)
     expect(locked.every(w => !w.unlocked)).toBe(true)
   })
+
+  it('each world has 3 rounds', () => {
+    const result = setup()
+    result.current.worldStates.forEach(ws => {
+      expect(ws.rounds).toHaveLength(3)
+    })
+  })
 })
 
 describe('Hero creation', () => {
@@ -147,8 +172,8 @@ describe('XP and levelling', () => {
     const result = setup()
     setupWithHero(result)
     act(() => result.current.selectWorld('egypt'))
-    act(() => result.current.enterWorld(TEST_CHALLENGES[0]))
-    act(() => result.current.submitAnswer(CORRECT_ANSWERS[0]))
+    act(() => result.current.enterWorld(TC.history))
+    act(() => result.current.submitAnswer(correctAnswer(TC.history)))
     expect(result.current.hero.xp).toBe(100)
   })
 
@@ -156,13 +181,13 @@ describe('XP and levelling', () => {
     const result = setup()
     setupWithHero(result)
     act(() => result.current.selectWorld('egypt'))
-    act(() => result.current.enterWorld(TEST_CHALLENGES[0]))
+    act(() => result.current.enterWorld(TC.history))
     // 3 correct first-attempt answers = 300 XP → Explorer (level 2)
-    act(() => result.current.submitAnswer(CORRECT_ANSWERS[0]))
-    act(() => result.current.continueFromResult(TEST_CHALLENGES[1]))
-    act(() => result.current.submitAnswer(CORRECT_ANSWERS[1]))
-    act(() => result.current.continueFromResult(TEST_CHALLENGES[2]))
-    act(() => result.current.submitAnswer(CORRECT_ANSWERS[2]))
+    act(() => result.current.submitAnswer(correctAnswer(TC.history)))
+    act(() => result.current.continueFromResult(TC.math))
+    act(() => result.current.submitAnswer(correctAnswer(TC.math)))
+    act(() => result.current.continueFromResult(TC.general))
+    act(() => result.current.submitAnswer(correctAnswer(TC.general)))
     expect(result.current.hero.xp).toBe(300)
     expect(result.current.hero.level).toBe(2)
     expect(result.current.hero.title).toBe('Explorer')
@@ -172,22 +197,49 @@ describe('XP and levelling', () => {
     const result = setup()
     setupWithHero(result)
     act(() => result.current.selectWorld('egypt'))
-    act(() => result.current.enterWorld(TEST_CHALLENGES[0]))
+    act(() => result.current.enterWorld(TC.history))
     act(() => result.current.submitAnswer(0)) // wrong — correctIndex is 1
     expect(result.current.hero.xp).toBe(0)
   })
 })
 
-describe('World progression', () => {
-  it('completing world[0] marks worlds[0].completed as true', () => {
+describe('Round progression', () => {
+  it('completing 5 challenges transitions phase to round-complete', () => {
     const result = setup()
     setupWithHero(result)
     act(() => result.current.selectWorld('egypt'))
-    act(() => result.current.enterWorld(TEST_CHALLENGES[0]))
-    CORRECT_ANSWERS.forEach((answer, i) => {
-      act(() => result.current.submitAnswer(answer))
-      act(() => result.current.continueFromResult(TEST_CHALLENGES[i + 1] ?? null))
-    })
+    act(() => result.current.enterWorld(ROUND1[0]))
+    playRound(result, ROUND1)
+    expect(result.current.phase).toBe('round-complete')
+  })
+
+  it('round 1 completion advances currentRound to 2', () => {
+    const result = setup()
+    setupWithHero(result)
+    act(() => result.current.selectWorld('egypt'))
+    act(() => result.current.enterWorld(ROUND1[0]))
+    playRound(result, ROUND1)
+    expect(result.current.currentRound).toBe(2)
+  })
+
+  it('startNextRound transitions to world-entry', () => {
+    const result = setup()
+    setupWithHero(result)
+    act(() => result.current.selectWorld('egypt'))
+    act(() => result.current.enterWorld(ROUND1[0]))
+    playRound(result, ROUND1)
+    act(() => result.current.startNextRound())
+    expect(result.current.phase).toBe('world-entry')
+  })
+})
+
+describe('World progression', () => {
+  it('completing all 3 rounds marks worlds[0].completed as true', () => {
+    const result = setup()
+    setupWithHero(result)
+    act(() => result.current.selectWorld('egypt'))
+    act(() => result.current.enterWorld(ROUND1[0]))
+    playWorldRounds(result)
     expect(result.current.worldStates[0].completed).toBe(true)
   })
 
@@ -195,11 +247,8 @@ describe('World progression', () => {
     const result = setup()
     setupWithHero(result)
     act(() => result.current.selectWorld('egypt'))
-    act(() => result.current.enterWorld(TEST_CHALLENGES[0]))
-    CORRECT_ANSWERS.forEach((answer, i) => {
-      act(() => result.current.submitAnswer(answer))
-      act(() => result.current.continueFromResult(TEST_CHALLENGES[i + 1] ?? null))
-    })
+    act(() => result.current.enterWorld(ROUND1[0]))
+    playWorldRounds(result)
     expect(result.current.worldStates[1].unlocked).toBe(true)
   })
 

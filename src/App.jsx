@@ -5,6 +5,7 @@ import WorldMap from './components/WorldMap.jsx'
 import WorldEntry from './components/WorldEntry.jsx'
 import ChallengeScreen from './components/ChallengeScreen.jsx'
 import ResultScreen from './components/ResultScreen.jsx'
+import RoundComplete from './components/RoundComplete.jsx'
 import WorldComplete from './components/WorldComplete.jsx'
 import GameComplete from './components/GameComplete.jsx'
 
@@ -16,16 +17,20 @@ export default function App() {
     hero,
     worldStates,
     currentChallenge,
+    currentRound,
+    roundXP,
     startGame,
     createHero,
     selectWorld,
     enterWorld,
     submitAnswer,
     continueFromResult,
+    startNextRound,
     returnToMap,
     getActiveWorld,
     getWorldState,
     getNextWorld,
+    getCompletedRoundStars,
   } = game
 
   const activeWorld = getActiveWorld()
@@ -62,6 +67,7 @@ export default function App() {
         <WorldEntry
           world={activeWorld}
           hero={hero}
+          roundNumber={currentRound}
           onEnter={enterWorld}
         />
       )}
@@ -81,6 +87,17 @@ export default function App() {
           world={activeWorld}
           currentChallenge={currentChallenge}
           onContinue={continueFromResult}
+        />
+      )}
+
+      {phase === 'round-complete' && activeWorld && (
+        <RoundComplete
+          world={activeWorld}
+          hero={hero}
+          roundNumber={currentRound - 1}
+          starsEarned={getCompletedRoundStars()}
+          xpEarnedThisRound={roundXP}
+          onContinue={startNextRound}
         />
       )}
 
