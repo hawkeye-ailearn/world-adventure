@@ -363,6 +363,129 @@ Phase 6 — Polish
 
 ---
 
+## Code Quality Rules (Sonar-enforced)
+
+These rules are checked by SonarQube on every push. Violations block the quality gate.
+
+### PropTypes — every component must declare them
+
+Every React component that accepts props **must** declare `PropTypes` at the bottom of the file.
+
+```js
+import PropTypes from 'prop-types'
+
+MyComponent.propTypes = {
+  world: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+  }).isRequired,
+  onContinue: PropTypes.func.isRequired,
+}
+```
+
+Rules:
+- Import `prop-types` at the top of the file.
+- Declare `.propTypes` **after** the function definition, not inside it.
+- Mark required props with `.isRequired`.
+- Use `PropTypes.shape({})` for object props — list every field the component actually reads.
+- Sub-shapes (e.g. `currentChallenge.data.challengeType`) must be nested inside their parent shape.
+- Components that accept no props need no `propTypes` declaration.
+
+### Array keys — never use the index variable
+
+Sonar flags `key={i}` or `key={index}` when the variable is the `.map()` index parameter.
+
+**Wrong:**
+```js
+items.map((item, i) => <div key={i} />)
+```
+
+**Right — use a stable ID from the data:**
+```js
+items.map(item => <div key={item.id} />)
+```
+
+**Right — if there is no natural ID, build a descriptive string key up front:**
+```js
+Array.from({ length: n }, (_, i) => `dot-${i + 1}`).map(key => <span key={key} />)
+```
+
+Never use a raw index parameter as a JSX key, even wrapped in a string template that still references the parameter as its sole content.
+
+### Nested ternaries — extract to a variable or function
+
+Sonar flags chained ternaries like `a ? b : c ? d : e`.
+
+**Wrong:**
+```js
+const label = level === 1 ? 'Apprentice' : level === 2 ? 'Explorer' : 'Champion'
+```
+
+**Right — use a lookup object:**
+```js
+const LEVEL_LABEL = { 1: 'Apprentice', 2: 'Explorer', 3: 'Champion' }
+const label = LEVEL_LABEL[level] ?? 'Champion'
+```
+
+**Right — use an explicit `if` block or extracted function:**
+```js
+function getLabel(level) {
+  if (level === 1) return 'Apprentice'
+  if (level === 2) return 'Explorer'
+  return 'Champion'
+}
+```
+
+Single-level ternaries (`a ? b : c`) are fine. Two or more levels are not.
+
+### Cognitive complexity — keep functions simple
+
+Sonar allows a maximum cognitive complexity of **15** per function. `buildSystemPrompt()` previously hit 69 by embedding all branching logic inline.
+
+Rules:
+- Extract each distinct "block" of conditional text into its own named function or constant.
+- A function that assembles a template string should do no branching itself — call helpers that already resolved the branches.
+- Lookup objects (`{ 1: '...', 2: '...' }`) are zero complexity; `if/else` chains and ternaries each add to the score.
+
+### Function nesting depth — max 4 levels
+
+Sonar flags functions nested more than 4 levels deep (function → callback → callback → callback → callback).
+
+This commonly appears in `setWorldStates(prev => prev.map(w => w.rounds.map(r => ...)))`.
+
+**Fix:** extract the inner transform as a named top-level function and call it from the setter callback:
+
+```js
+function applyRoundUpdate(worldStates, worldId, roundNumber) {
+  return worldStates.map(w => {
+    if (w.id !== worldId) return w
+    return { ...w, rounds: w.rounds.map(r => r.number === roundNumber ? { ...r, completed: true } : r) }
+  })
+}
+
+// Inside the hook:
+setWorldStates(prev => applyRoundUpdate(prev, activeWorldId, currentRound))
+```
+
+### Default parameters over null-coalescing reassignment
+
+**Wrong:**
+```js
+function foo(x) {
+  const val = x ?? 'default'
+  ...
+}
+```
+
+**Right:**
+```js
+function foo(x = 'default') {
+  ...
+}
+```
+
+---
+
 ## What NOT To Do
 
 - **Don't add react-router.** Phase-based state switching is intentional and simpler.
