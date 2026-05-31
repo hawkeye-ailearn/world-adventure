@@ -14,16 +14,22 @@ export default async function handler(req, res) {
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1024,
+        model: 'claude-sonnet-4-6',
+        max_tokens: 2000,
         system: systemPrompt,
         messages,
       }),
     })
 
     if (!response.ok) {
-      const err = await response.text()
-      return res.status(response.status).json({ error: err })
+      const errText = await response.text()
+      let errorMessage = 'Anthropic API error'
+      try {
+        const errData = JSON.parse(errText)
+        errorMessage = errData.error?.message || errorMessage
+      } catch { /* non-JSON error body */ }
+      console.error('Anthropic rejected request:', errText)
+      return res.status(response.status).json({ error: errorMessage })
     }
 
     const data = await response.json()
