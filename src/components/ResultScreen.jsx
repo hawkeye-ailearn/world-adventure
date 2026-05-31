@@ -12,17 +12,20 @@ export default function ResultScreen({ hero, world, currentChallenge, onContinue
 
   useEffect(() => {
     const nextNum = currentChallenge.challengeNumber + 1
-    if (nextNum <= 4) {
+    const maxForRound = currentChallenge.roundNumber === 3 ? 6 : 5
+    if (nextNum <= maxForRound) {
       prefetchPromise.current = prefetchNext({
         hero,
         worldId: world.id,
+        roundNumber: currentChallenge.roundNumber,
         nextChallengeNumber: nextNum,
       })
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   async function handleContinue() {
-    if (currentChallenge.challengeNumber >= 4) {
+    const maxForRound = currentChallenge.roundNumber === 3 ? 6 : 5
+    if (currentChallenge.challengeNumber >= maxForRound) {
       onContinue(null)
       return
     }
@@ -34,6 +37,7 @@ export default function ResultScreen({ hero, world, currentChallenge, onContinue
         nextData = await fetchChallenge({
           hero,
           worldId: world.id,
+          roundNumber: currentChallenge.roundNumber,
           challengeNumber: currentChallenge.challengeNumber + 1,
         })
       } catch {

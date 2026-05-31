@@ -4,7 +4,7 @@ const CLASS_EMOJI = { warrior: '⚔️', wizard: '🧙', explorer: '🗺️' }
 
 const XP_MAX = { 1: 300, 2: 700, 3: 1200, 4: 9999 }
 
-export default function HeroBar({ hero }) {
+export default function HeroBar({ hero, challengeContext }) {
   const { name, class: heroClass, level, title, totalXP } = hero
   const max = XP_MAX[level] ?? 300
   const prev = level > 1 ? XP_MAX[level - 1] : 0
@@ -59,6 +59,28 @@ export default function HeroBar({ hero }) {
           Lv {level} · {title}
         </span>
       </div>
+
+      {challengeContext && (
+        <div className="flex flex-col min-w-0 shrink-0">
+          <span className="font-nunito text-xs" style={{ color: '#8899bb' }}>
+            Round {challengeContext.roundNumber} · {challengeContext.roundName}
+          </span>
+          <div className="flex gap-0.5 mt-0.5">
+            {Array.from({ length: challengeContext.totalChallengesInRound }).map((_, i) => (
+              <span
+                key={i}
+                style={{
+                  fontSize: 8,
+                  color: i < challengeContext.challengeNumber ? '#f2cc60' : 'rgba(180,200,220,0.25)',
+                  lineHeight: 1,
+                }}
+              >
+                ●
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* XP bar */}
       <div className="flex-1 flex flex-col gap-0.5 min-w-0">

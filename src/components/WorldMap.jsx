@@ -171,6 +171,28 @@ export default function WorldMap({ worldStates, onSelectWorld }) {
                   >
                     {world.name}
                   </div>
+
+                  {/* Round progress dots */}
+                  {unlocked && (
+                    <div className="flex gap-1 justify-center mt-1">
+                      {[1, 2, 3].map(roundNum => {
+                        const roundCompleted = ws?.rounds?.[roundNum - 1]?.completed ?? false
+                        return (
+                          <span
+                            key={roundNum}
+                            style={{
+                              fontSize: 8,
+                              color: roundCompleted ? world.accentColor : 'rgba(180,200,220,0.3)',
+                              textShadow: roundCompleted ? `0 0 4px ${world.accentColor}` : 'none',
+                              lineHeight: 1,
+                            }}
+                          >
+                            {roundCompleted ? '●' : '○'}
+                          </span>
+                        )
+                      })}
+                    </div>
+                  )}
                 </div>
               </div>
             )
