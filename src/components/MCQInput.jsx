@@ -28,6 +28,7 @@ export default function MCQInput({ options, onAnswer, disabled, selectedIndex, c
         return (
           <button
             key={i}
+            data-testid={`mcq-option-${i}`}
             onClick={() => !isDisabled && onAnswer(i)}
             disabled={isDisabled}
             className="rounded-2xl font-nunito font-bold text-left flex items-center gap-2"

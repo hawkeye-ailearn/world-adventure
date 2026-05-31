@@ -26,6 +26,7 @@ export default function ChallengeScreen({ hero, world, currentChallenge, onAnswe
 
   return (
     <div
+      data-testid="challenge-screen"
       className="w-full h-full flex flex-col overflow-hidden animate-fadeIn"
       style={{ background: world.lightBg }}
     >
@@ -67,6 +68,7 @@ export default function ChallengeScreen({ hero, world, currentChallenge, onAnswe
         {/* Boss banner */}
         {isBoss && (
           <div
+            data-testid="boss-banner"
             className="rounded-xl px-4 py-2 text-center font-fredoka text-lg animate-shimmer"
             style={{ background: '#3d0000', color: '#ff6060', border: '2px solid #ff6060' }}
           >
@@ -96,11 +98,12 @@ export default function ChallengeScreen({ hero, world, currentChallenge, onAnswe
           }}
         >
           <div
+            data-testid="hint-box"
             className="rounded-xl px-4 py-3 flex gap-2 items-start"
             style={{ background: '#fffbe6', border: '1.5px solid #f2cc60' }}
           >
             <span>💡</span>
-            <p className="font-nunito text-sm" style={{ color: '#7a5c00' }}>{data.hint}</p>
+            <p data-testid="hint-text" className="font-nunito text-sm" style={{ color: '#7a5c00' }}>{data.hint}</p>
           </div>
         </div>
 

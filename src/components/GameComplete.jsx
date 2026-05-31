@@ -20,6 +20,7 @@ export default function GameComplete({ hero }) {
 
   return (
     <div
+      data-testid="game-complete-screen"
       className="w-full h-full flex flex-col items-center justify-center relative overflow-hidden"
       style={{ background: '#0d0f1a' }}
     >

@@ -32,6 +32,7 @@ export default function NumberPad({ onAnswer, correctAnswer, world }) {
     <div className="flex flex-col items-center gap-3 w-full">
       {/* Display */}
       <div
+        data-testid="numberpad-display"
         className="w-full rounded-2xl flex items-center justify-center font-fredoka"
         style={{
           background: submitted
@@ -59,9 +60,11 @@ export default function NumberPad({ onAnswer, correctAnswer, world }) {
         {PAD_ROWS.flat().map((key, i) => {
           const isSubmit = key === '✓'
           const isBack = key === '⌫'
+          const testId = isSubmit ? 'numberpad-submit' : isBack ? 'numberpad-backspace' : `numberpad-key-${key}`
           return (
             <button
               key={i}
+              data-testid={testId}
               onClick={() => handleKey(key)}
               disabled={submitted}
               className="rounded-xl font-fredoka flex items-center justify-center"
